@@ -1,5 +1,5 @@
 # <img src="https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/calculator.svg" card_color="#22A7F0" width="50" height="50" style="vertical-align:bottom"/> Statistant
-Let mycroft perform basic statistical calulations
+Let mycroft perform basic statistical calculations
 
 ## About
 You can ask mycroft for:
