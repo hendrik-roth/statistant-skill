@@ -8,7 +8,7 @@ You can ask mycroft for:
 - variance, arithmetic average, median, mode, quartil range, range, standard deviation, quartiles, quantiles
 - simple/multiple linear regression
 - logistic/mulitnominal logistic regression
-- hypothesis tests (chi-squared, 1-samp-ttest, 2-samp-ttest)
+- hypothesis tests (chi-squared, 1-samp-ttest, 2-samp-ttest, paired-sample-test)
 - cluster analysis
 - percantage changes
 
