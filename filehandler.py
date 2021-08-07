@@ -38,18 +38,15 @@ class FileHandler:
         self.dir_path = path
 
         # search for correct file because filename has no type
-        # TODO find faster way
         files = os.listdir(self.dir_path)
-        for file in files:
-            if file.split(".")[0] == filename:
-                filename = file
+        search_result = [file for file in files if file.split(".")[0] == filename]
 
-        # check if file contains type (must contain a "." for type). if no type, raise FileNotFound error
-        if "." not in filename:
-            raise FileNotFoundError("File not found or not unique")
+        # check if there is a search result for filename. If not (=empty), raise FileNotFound Error else continue
+        if not search_result:
+            raise FileNotFoundError("File not found")
 
-        self.filename = filename
-        self.file_path = f"{path}/{filename}"
+        self.filename = search_result[0]
+        self.file_path = f"{self.dir_path}/{self.filename}"
 
         # init type
         self.type = self.filename.split(".", 1)[1]
