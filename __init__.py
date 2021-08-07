@@ -1,5 +1,6 @@
 from mycroft import MycroftSkill, intent_file_handler
 import os
+from .filehandler import FileHandler
 
 
 class Statistant(MycroftSkill):
@@ -22,4 +23,3 @@ class Statistant(MycroftSkill):
 
 def create_skill():
     return Statistant()
-
