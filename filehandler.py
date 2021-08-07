@@ -44,12 +44,12 @@ class FileHandler:
             if file.split(".")[0] == filename:
                 filename = file
 
-        self.file_path = f"{path}/{filename}"
-
         # check if file contains type (must contain a "." for type). if no type, raise FileNotFound error
         if "." not in filename:
             raise FileNotFoundError("File not found or not unique")
+
         self.filename = filename
+        self.file_path = f"{path}/{filename}"
 
         # init type
         self.type = self.filename.split(".", 1)[1]
