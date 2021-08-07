@@ -24,13 +24,24 @@ class FileHandler:
         filename : str
             is given name of the file
         """
-        self.filename = filename
 
-        # init file path
+        # init directory path
         directory = "statistant"
         parent_dir = os.path.expanduser("~")
         path = os.path.join(parent_dir, directory)
+        self.dir_path = path
+
+        # search for correct fil because filename has no type
+        # TODO find faster way
+        files = os.listdir(self.dir_path)
+        for file in files:
+            if file.split(".")[0] == filename:
+                filename = file
+            else:
+                raise FileNotFoundError("Sorry, File cannot found")
+
         self.file_path = f"{path}/{filename}"
+        self.filename = filename
 
         # init type
         self.type = self.filename.split(".", 1)[1]
