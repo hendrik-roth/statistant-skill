@@ -33,12 +33,12 @@ class FileHandler:
         self.file_path = f"{path}/{filename}"
 
         # init type
-        self.type = self.filename.split(".", 1)[0]
+        self.type = self.filename.split(".", 1)[1]
 
         # init content
         # TODO add file types in type_chooser if read functions exists
         type_chooser = {'csv': self.read_csv()}
-        self.content = type_chooser[self.type]()
+        self.content = type_chooser[self.type]
 
     def get_file_path(self):
         return self.file_path
