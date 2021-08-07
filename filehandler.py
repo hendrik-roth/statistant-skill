@@ -9,9 +9,15 @@ class FileHandler:
     Attributes
     ----------
     filename : str
-        name of the file
+        name of the file. contains the name+file type. e.g. 'test.csv'
     file_path : str
         path of the file as String
+    dir_path : str
+        path of the 'statistant' directory
+    type : str
+        file type of the file
+    content : DataFrame
+        content of the file as a DataFrame. Can be used for calculations
     """
 
     def __init__(self, filename):
@@ -31,23 +37,25 @@ class FileHandler:
         path = os.path.join(parent_dir, directory)
         self.dir_path = path
 
-        # search for correct fil because filename has no type
+        # search for correct file because filename has no type
         # TODO find faster way
         files = os.listdir(self.dir_path)
         for file in files:
             if file.split(".")[0] == filename:
                 filename = file
-            else:
-                raise FileNotFoundError("Sorry, File cannot found")
 
         self.file_path = f"{path}/{filename}"
+
+        # check if file contains type (must contain a "." for type). if no type, raise FileNotFound error
+        if "." not in filename:
+            raise FileNotFoundError("File not found or not unique")
         self.filename = filename
 
         # init type
         self.type = self.filename.split(".", 1)[1]
 
         # init content
-        # TODO add file types in type_chooser if read functions exists
+        # TODO add file types in type_chooser if read functions exist
         type_chooser = {'csv': self.read_csv()}
         self.content = type_chooser[self.type]
 
