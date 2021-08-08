@@ -83,6 +83,6 @@ class FileHandler:
             DataFrame of reading result
         """
         path = self.file_path
-        df = pd.read_excel(path, engine="openpyxl")
+        df = pd.read_excel(path, sheet_name=self.filename)
         df.columns = df.columns.str.lower()
         return df
