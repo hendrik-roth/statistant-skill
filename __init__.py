@@ -16,9 +16,19 @@ class Statistant(MycroftSkill):
         if not self.file_system.exists(path):
             os.mkdir(path)
 
-    @intent_file_handler('statistant.intent')
-    def handle_statistant(self, message):
-        self.speak_dialog('statistant')
+    @intent_file_handler('mean.intent')
+    def handle_mean(self, message):
+        filename = message.data.get('file')
+        col = message.data.get('col')
+
+        try:
+            file_handler = FileHandler(filename)
+            df = file_handler.content
+            mean = df[col].mean()
+
+            self.speak_dialog('mean', {'col': col, 'avg': mean})
+        except FileNotFoundError:
+            self.speak_dialog('FileNotFound.error')
 
 
 def create_skill():
