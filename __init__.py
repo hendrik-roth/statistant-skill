@@ -19,7 +19,7 @@ class Statistant(MycroftSkill):
     @intent_file_handler('mean.intent')
     def handle_mean(self, message):
         filename = message.data.get('file')
-        col = message.data.get('col')
+        col = message.data.get('col').lower()
 
         try:
             file_handler = FileHandler(filename)

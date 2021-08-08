@@ -70,4 +70,5 @@ class FileHandler:
         """
         path = self.file_path
         df = pd.read_csv(path)
+        df.columns = df.columns.str.lower()
         return df
