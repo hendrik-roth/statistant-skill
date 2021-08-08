@@ -17,7 +17,7 @@ class Statistant(MycroftSkill):
         if not self.file_system.exists(path):
             os.mkdir(path)
 
-    @intent_handler(IntentBuilder('mean').require('average').require('col').require('file'))
+    @intent_handler(IntentBuilder('mean').require('average'))
     def handle_mean(self, message):
         filename = message.data.get('file')
         col = message.data.get('col').lower()
