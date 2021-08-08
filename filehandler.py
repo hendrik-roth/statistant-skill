@@ -53,7 +53,7 @@ class FileHandler:
 
         # init content
         # TODO add file types in type_chooser if read functions exist
-        type_chooser = {'csv': self.read_csv()}
+        type_chooser = {'csv': self.read_csv(), 'xlsx': self.read_xlsx()}
         self.content = type_chooser[self.type]
 
     def get_file_path(self):
@@ -70,5 +70,19 @@ class FileHandler:
         """
         path = self.file_path
         df = pd.read_csv(path)
+        df.columns = df.columns.str.lower()
+        return df
+
+    def read_xlsx(self):
+        """
+        function for reading the file as xlsx
+
+        Returns
+        -------
+        df : DataFrame
+            DataFrame of reading result
+        """
+        path = self.file_path
+        df = pd.read_excel(path)
         df.columns = df.columns.str.lower()
         return df
