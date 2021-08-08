@@ -1,5 +1,5 @@
 from adapt.intent import IntentBuilder
-from mycroft import MycroftSkill, intent_file_handler
+from mycroft import MycroftSkill, intent_file_handler, intent_handler
 import os
 from .filehandler import FileHandler
 
@@ -17,7 +17,7 @@ class Statistant(MycroftSkill):
         if not self.file_system.exists(path):
             os.mkdir(path)
 
-    @intent_file_handler(IntentBuilder('mean').require('average').require('col').require('file'))
+    @intent_handler(IntentBuilder('mean').require('average').require('col').require('file'))
     def handle_mean(self, message):
         filename = message.data.get('file')
         col = message.data.get('col').lower()
