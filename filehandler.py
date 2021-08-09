@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import openpyxl
 from .exceptions import FileNotUniqueError
 
 
