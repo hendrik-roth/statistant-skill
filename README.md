@@ -1,5 +1,5 @@
 # <img src="https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/calculator.svg" card_color="#22A7F0" width="50" height="50" style="vertical-align:bottom"/> Statistant
-> **_NOTE:_**  currently under development
+> **_NOTE:_**  currently under development. Hence not all functions are possible
 
 Let mycroft perform basic statistical calculations
 
