@@ -62,7 +62,8 @@ class FileHandler:
             'csv': self.read_csv,
             'xlsx': self.read_xlsx,
             'json': self.read_json,
-            'pkl': self.read_pickle
+            'pkl': self.read_pickle,
+            'txt': self.read_csv
         }
         self.content = type_chooser[self.type]()
 
@@ -93,7 +94,7 @@ class FileHandler:
             DataFrame of reading result
         """
         path = self.file_path
-        df = pd.read_excel(path, engine="openpyxl")
+        df = pd.read_excel(path, engine="xlrd")
         df.columns = df.columns.str.lower()
         return df
 
