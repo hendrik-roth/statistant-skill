@@ -60,10 +60,11 @@ class FileHandler:
         # TODO add file types in type_chooser if read functions exist
         type_chooser = {
             'csv': self.read_csv,
+            'txt': self.read_csv,  # reading txt-files has to be done with read_csv also
             'xlsx': self.read_xlsx,
             'json': self.read_json,
             'pkl': self.read_pickle,
-            'txt': self.read_csv
+            'h5': self.read_hdf
         }
         self.content = type_chooser[self.type]()
 
@@ -114,7 +115,7 @@ class FileHandler:
 
     def read_pickle(self):
         """
-        function for reading the file as json
+        function for reading the file as pickle
 
         Returns
         -------
@@ -123,5 +124,19 @@ class FileHandler:
         """
         path = self.file_path
         df = pd.read_pickle(path)
+        df.columns = df.columns.str.lower()
+        return df
+
+    def read_hdf(self):
+        """
+        function for reading the file as h5
+
+        Returns
+        -------
+        df : DataFrame
+            DataFrame of reading result
+        """
+        path = self.file_path
+        df = pd.read_hdf(path)
         df.columns = df.columns.str.lower()
         return df
