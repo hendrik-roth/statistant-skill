@@ -58,7 +58,7 @@ class FileHandler:
         self.type = self.filename.split(".", 1)[1]
 
         # init content
-        # For future adding supported type: add type ending as key and reading function as value. no more actions to do
+        # For future adding supported type: add type as key and reading function as value. no more actions to do
         type_chooser = {
             'csv': self.read_csv,
             'txt': self.read_csv,  # reading txt-files has to be done with read_csv too
