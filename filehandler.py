@@ -42,6 +42,7 @@ class FileHandler:
         files = os.scandir(self.dir_path)
         search_result = [file.name for file in files if
                          file.name.split(".", 1)[0] == filename.lower() and file.is_file()]
+        files.close()
 
         # check if there is a search result for filename. If not (=empty), raise FileNotFound Error else continue
         if not search_result:
