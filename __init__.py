@@ -2,6 +2,7 @@ from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_file_handler, intent_handler
 import os
 from .filehandler import FileHandler
+from .exceptions import FileNotUniqueError
 
 
 class Statistant(MycroftSkill):
@@ -30,6 +31,8 @@ class Statistant(MycroftSkill):
             self.speak_dialog('mean', {'col': col, 'avg': mean})
         except FileNotFoundError:
             self.speak_dialog('FileNotFound.error')
+        except FileNotUniqueError:
+            self.speak_dialog('FileNotUnique.error')
 
 
 def create_skill():
