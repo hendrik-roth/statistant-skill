@@ -30,9 +30,9 @@ class Statistant(MycroftSkill):
 
             self.speak_dialog('mean', {'col': col, 'avg': mean})
         except FileNotFoundError:
-            self.speak_dialog('FileNotFound.error')
+            self.speak_dialog('FileNotFound.error', {'filename': filename})
         except FileNotUniqueError:
-            self.speak_dialog('FileNotUnique.error')
+            self.speak_dialog('FileNotUnique.error', {'filename': filename})
 
 
 def create_skill():
