@@ -26,7 +26,7 @@ class Statistant(MycroftSkill):
         try:
             file_handler = FileHandler(filename)
             df = file_handler.content
-            mean = df[col].mean()
+            mean = round(df[col].mean(), 3)
 
             self.speak_dialog('mean', {'col': col, 'avg': mean})
         except FileNotFoundError:

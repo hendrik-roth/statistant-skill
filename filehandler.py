@@ -57,7 +57,10 @@ class FileHandler:
 
         # init content
         # TODO add file types in type_chooser if read functions exist
-        type_chooser = {'csv': self.read_csv, 'xlsx': self.read_xlsx}
+        type_chooser = {
+            'csv': self.read_csv,
+            'xlsx': self.read_xlsx,
+            'json': self.read_json}
         self.content = type_chooser[self.type]()
 
     def get_file_path(self):
@@ -91,3 +94,16 @@ class FileHandler:
         df.columns = df.columns.str.lower()
         return df
 
+    def read_json(self):
+        """
+        function for reading the file as json
+
+        Returns
+        -------
+        df : DataFrame
+            DataFrame of reading result
+        """
+        path = self.file_path
+        df = pd.read_json(path)
+        df.columns = df.columns.str.lower()
+        return df
