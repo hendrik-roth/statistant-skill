@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 
+from .exceptions import FileNotUniqueError
+
 
 class FileHandler:
     """
@@ -44,6 +46,8 @@ class FileHandler:
         # check if there is a search result for filename. If not (=empty), raise FileNotFound Error else continue
         if not search_result:
             raise FileNotFoundError("File not found")
+        elif len(search_result) > 1:
+            raise FileNotUniqueError("File has no unique name and hence cannot be identified")
 
         self.filename = search_result[0]
         self.file_path = f"{self.dir_path}/{self.filename}"
@@ -86,3 +90,4 @@ class FileHandler:
         df = pd.read_excel(path)
         df.columns = df.columns.str.lower()
         return df
+

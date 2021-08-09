@@ -1,0 +1,2 @@
+class FileNotUniqueError(Exception):
+    pass
