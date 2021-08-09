@@ -53,8 +53,8 @@ class FileHandler:
 
         # init content
         # TODO add file types in type_chooser if read functions exist
-        type_chooser = {'csv': self.read_csv(), 'xlsx': self.read_xlsx()}
-        self.content = type_chooser[self.type]
+        type_chooser = {'csv': self.read_csv, 'xlsx': self.read_xlsx}
+        self.content = type_chooser[self.type]()
 
     def get_file_path(self):
         return self.file_path
