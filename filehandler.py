@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 
+from .exceptions import FileNotUniqueError
+
 
 class FileHandler:
     """
@@ -44,6 +46,8 @@ class FileHandler:
         # check if there is a search result for filename. If not (=empty), raise FileNotFound Error else continue
         if not search_result:
             raise FileNotFoundError("File not found")
+        elif len(search_result) > 1:
+            raise FileNotUniqueError("File has no unique name and hence cannot be identified")
 
         self.filename = search_result[0]
         self.file_path = f"{self.dir_path}/{self.filename}"
@@ -53,7 +57,12 @@ class FileHandler:
 
         # init content
         # TODO add file types in type_chooser if read functions exist
-        type_chooser = {'csv': self.read_csv, 'xlsx': self.read_xlsx}
+        type_chooser = {
+            'csv': self.read_csv,
+            'xlsx': self.read_xlsx,
+            'json': self.read_json,
+            'pkl': self.read_pickle
+        }
         self.content = type_chooser[self.type]()
 
     def get_file_path(self):
@@ -84,5 +93,33 @@ class FileHandler:
         """
         path = self.file_path
         df = pd.read_excel(path)
+        df.columns = df.columns.str.lower()
+        return df
+
+    def read_json(self):
+        """
+        function for reading the file as json
+
+        Returns
+        -------
+        df : DataFrame
+            DataFrame of reading result
+        """
+        path = self.file_path
+        df = pd.read_json(path)
+        df.columns = df.columns.str.lower()
+        return df
+
+    def read_pickle(self):
+        """
+        function for reading the file as json
+
+        Returns
+        -------
+        df : DataFrame
+            DataFrame of reading result
+        """
+        path = self.file_path
+        df = pd.read_pickle(path)
         df.columns = df.columns.str.lower()
         return df
