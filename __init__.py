@@ -1,6 +1,8 @@
 from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_file_handler, intent_handler
 import os
+from word2number import w2n
+
 from .filehandler import FileHandler
 from .exceptions import FileNotUniqueError
 from functools import partial
@@ -23,19 +25,40 @@ class Statistant(MycroftSkill):
 
     @intent_file_handler('mean.intent')
     def handle_mean(self, message):
+        """
+        Function for handling mean intent.
+        A user can ask Mycroft for calculating the average (mean) of a column or of specific rows in a column.
+
+        Parameters
+        ----------
+        message
+        """
+        func = "average"
         filename = message.data.get('file')
-        col = message.data.get('col').lower()
+        col = message.data.get('colname').lower()
 
         try:
             file_handler = FileHandler(filename)
             df = file_handler.content
-            mean = round(df[col].mean(), 3)
 
-            self.speak_dialog('mean', {'col': col, 'avg': mean})
+            # if search_one is not none -> intent with rows and other calculation, else just normal .mean calc
+            if message.data.get('lower') is not None:
+
+                lower = w2n.word_to_num(message.data.get('lower'))
+                upper = w2n.word_to_num(message.data.get('upper'))
+                # user will more likely say to index=0 row=1, etc. -> sub -1
+                mean = round(df.loc[df.index[(lower - 1):upper], col].mean(), 3)
+            else:
+                mean = round(df[col].mean(), 3)
+
+            self.speak_dialog('mean', {'colname': col, 'avg': mean})
+
         except FileNotFoundError:
             self.speak_dialog('FileNotFound.error', {'filename': filename})
         except FileNotUniqueError:
             self.speak_dialog('FileNotUnique.error', {'filename': filename})
+        except KeyError:
+            self.speak_dialog('Key.error', {'colname': col, 'func': func})
 
 
 def create_skill():
