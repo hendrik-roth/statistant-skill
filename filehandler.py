@@ -42,8 +42,10 @@ class FileHandler:
         files = os.scandir(self.dir_path)
         search_result = [file.name for file in files if
                          file.name.split(".", 1)[0] == filename.lower() and file.is_file()]
+        files.close()
 
-        # check if there is a search result for filename. If not (=empty), raise FileNotFound Error else continue
+        # If no result (=empty), raise FileNotFound Error
+        # if search result has more than 1 result, file cannot identified -> FileNotUnique Error
         if not search_result:
             raise FileNotFoundError("File not found")
         elif len(search_result) > 1:
@@ -56,12 +58,14 @@ class FileHandler:
         self.type = self.filename.split(".", 1)[1]
 
         # init content
-        # TODO add file types in type_chooser if read functions exist
+        # For future adding supported type: add type as key and reading function as value. no more actions to do
         type_chooser = {
             'csv': self.read_csv,
+            'txt': self.read_csv,  # reading txt-files has to be done with read_csv too
             'xlsx': self.read_xlsx,
             'json': self.read_json,
-            'pkl': self.read_pickle
+            'pkl': self.read_pickle,
+            'h5': self.read_hdf
         }
         self.content = type_chooser[self.type]()
 
@@ -92,7 +96,7 @@ class FileHandler:
             DataFrame of reading result
         """
         path = self.file_path
-        df = pd.read_excel(path, engine="openpyxl")
+        df = pd.read_excel(path, engine="xlrd")
         df.columns = df.columns.str.lower()
         return df
 
@@ -112,7 +116,7 @@ class FileHandler:
 
     def read_pickle(self):
         """
-        function for reading the file as json
+        function for reading the file as pickle
 
         Returns
         -------
@@ -121,5 +125,19 @@ class FileHandler:
         """
         path = self.file_path
         df = pd.read_pickle(path)
+        df.columns = df.columns.str.lower()
+        return df
+
+    def read_hdf(self):
+        """
+        function for reading the file as h5
+
+        Returns
+        -------
+        df : DataFrame
+            DataFrame of reading result
+        """
+        path = self.file_path
+        df = pd.read_hdf(path)
         df.columns = df.columns.str.lower()
         return df
