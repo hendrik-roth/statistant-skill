@@ -1,1 +1,1 @@
-(What is | Tell me) the average of the column {searching} (from row {search_one} to row {search_two} | ) in {file}
+(What is | Tell me) the average of the column {colname} (from row {lower} to row {upper} | ) in {file}
