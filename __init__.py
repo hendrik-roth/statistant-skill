@@ -5,6 +5,7 @@ from word2number import w2n
 
 from .filehandler import FileHandler
 from .exceptions import FileNotUniqueError
+from functools import partial
 
 
 class Statistant(MycroftSkill):
@@ -12,13 +13,15 @@ class Statistant(MycroftSkill):
         # init Skill
         super().__init__()
 
-        # init directory named "statistant" in home directory if it does not exists
+        # init directory named "statistant/source_files" in home directory if it does not exists for reading files
+        # init directory named "statistant/results" in home directory if it does not exists to save results
         # directory is for reading files
-        directory = "statistant"
         parent_dir = os.path.expanduser("~")
-        path = os.path.join(parent_dir, directory)
-        if not self.file_system.exists(path):
-            os.mkdir(path)
+        directories = ("statistant/source_files", "statistant/results")
+        concat_root_path = partial(os.path.join, parent_dir)
+        make_directory = partial(os.makedirs, exist_ok=True)
+        for path_items in map(concat_root_path, directories):
+            make_directory(path_items)
 
     @intent_file_handler('mean.intent')
     def handle_mean(self, message):
