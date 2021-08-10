@@ -32,9 +32,6 @@ class Statistant(MycroftSkill):
         try:
             file_handler = FileHandler(filename)
             df = file_handler.content
-            row1 = None
-            row2 = None
-
             # if search_one is not none -> intent with rows
             if message.data.get('lower') is not None:
 
