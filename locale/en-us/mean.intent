@@ -1,2 +1,1 @@
-What is the average of the column {col} in the file {file}
-tell me the average of the column {col} in the file {file}
+(What is | Tell me) the average of the column {searching} (from row {search_one} to row {search_two} | ) in {file}
