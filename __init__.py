@@ -25,6 +25,14 @@ class Statistant(MycroftSkill):
 
     @intent_file_handler('mean.intent')
     def handle_mean(self, message):
+        """
+        Function for handling mean intent.
+        A user can ask Mycroft for calculating the average (mean) of a column or of specific rows in a column.
+
+        Parameters
+        ----------
+        message
+        """
         func = "average"
         filename = message.data.get('file')
         col = message.data.get('colname').lower()
@@ -32,17 +40,19 @@ class Statistant(MycroftSkill):
         try:
             file_handler = FileHandler(filename)
             df = file_handler.content
-            # if search_one is not none -> intent with rows
+
+            # if search_one is not none -> intent with rows and other calculation, else just normal .mean calc
             if message.data.get('lower') is not None:
 
+                lower = w2n.word_to_num(message.data.get('lower'))
+                upper = w2n.word_to_num(message.data.get('upper'))
                 # user will more likely say to index=0 row=1, etc. -> sub -1
-                row1 = w2n.word_to_num(message.data.get('lower'))
-                row2 = w2n.word_to_num(message.data.get('upper'))
-                mean = round(df.loc[df.index[(row1 - 1):row2], col].mean(), 3)
+                mean = round(df.loc[df.index[(lower - 1):upper], col].mean(), 3)
             else:
                 mean = round(df[col].mean(), 3)
 
             self.speak_dialog('mean', {'colname': col, 'avg': mean})
+
         except FileNotFoundError:
             self.speak_dialog('FileNotFound.error', {'filename': filename})
         except FileNotUniqueError:
