@@ -34,10 +34,13 @@ class Statistant(MycroftSkill):
             row1 = None
             row2 = None
 
+            # if search_one is not none -> intent with rows
             if message.data.get('search_one') is not None:
+
+                # user will more likely say to index=0 row=1, etc. -> sub -1
                 row1 = w2n.word_to_num(message.data.get('search_one'))
                 row2 = w2n.word_to_num(message.data.get('search_two'))
-                mean = round(df.loc[df.index[row1:row2], col].mean(), 3)
+                mean = round(df.loc[df.index[(row1 - 1):row2], col].mean(), 3)
             else:
                 mean = round(df[col].mean(), 3)
 
