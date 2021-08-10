@@ -32,8 +32,8 @@ class FileHandler:
             is given name of the file
         """
 
-        # init directory path
-        directory = "statistant"
+        # init directory path for reading files
+        directory = "statistant/source_files"
         parent_dir = os.path.expanduser("~")
         path = os.path.join(parent_dir, directory)
         self.dir_path = path
