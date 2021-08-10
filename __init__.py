@@ -41,7 +41,7 @@ class Statistant(MycroftSkill):
             file_handler = FileHandler(filename)
             df = file_handler.content
 
-            # if search_one is not none -> intent with rows and other calculation, else just normal .mean calc
+            # if lower is not none -> intent with rows and other calculation, else just normal .mean calc
             if message.data.get('lower') is not None:
 
                 lower = w2n.word_to_num(message.data.get('lower'))
