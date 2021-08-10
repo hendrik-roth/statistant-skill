@@ -83,6 +83,7 @@ class FileHandler:
         """
         path = self.file_path
         df = pd.read_csv(path)
+        df.dropna(how="all", inplace=True)
         df.columns = df.columns.str.lower()
         return df
 
@@ -97,6 +98,7 @@ class FileHandler:
         """
         path = self.file_path
         df = pd.read_excel(path)
+        df.dropna(how="all", inplace=True)
         df.columns = df.columns.str.lower()
         return df
 
@@ -111,6 +113,7 @@ class FileHandler:
         """
         path = self.file_path
         df = pd.read_json(path)
+        df.dropna(how="all", inplace=True)
         df.columns = df.columns.str.lower()
         return df
 
@@ -125,6 +128,7 @@ class FileHandler:
         """
         path = self.file_path
         df = pd.read_pickle(path)
+        df.dropna(how="all", inplace=True)
         df.columns = df.columns.str.lower()
         return df
 
@@ -139,5 +143,6 @@ class FileHandler:
         """
         path = self.file_path
         df = pd.read_hdf(path)
+        df.dropna(how="all", inplace=True)
         df.columns = df.columns.str.lower()
         return df
