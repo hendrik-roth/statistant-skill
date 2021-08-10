@@ -25,6 +25,7 @@ class Statistant(MycroftSkill):
 
     @intent_file_handler('mean.intent')
     def handle_mean(self, message):
+        func = "average"
         filename = message.data.get('file')
         col = message.data.get('colname').lower()
 
@@ -49,6 +50,8 @@ class Statistant(MycroftSkill):
             self.speak_dialog('FileNotFound.error', {'filename': filename})
         except FileNotUniqueError:
             self.speak_dialog('FileNotUnique.error', {'filename': filename})
+        except KeyError:
+            self.speak_dialog('Key.error', {'colname': col, 'func': func})
 
 
 def create_skill():
