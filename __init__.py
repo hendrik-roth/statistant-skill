@@ -2,6 +2,8 @@ from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_file_handler, intent_handler
 import os
 
+from word2number import w2n
+
 from .filehandler import FileHandler
 from .exceptions import FileNotUniqueError
 from functools import partial
@@ -43,13 +45,13 @@ class Statistant(MycroftSkill):
             # if lower is not none -> intent with rows and other calculation, else just normal .mean calc
             if message.data.get('lower') is not None:
 
-                lower = int(message.data.get('lower'))
-                upper = int(message.data.get('upper'))
+                lower = w2n.word_to_num(message.data.get('lower'))
+                upper = w2n.word_to_num(message.data.get('upper'))
                 # user will more likely say to index=0 row=1, etc. -> sub -1
                 mean = round(df.loc[df.index[(lower - 1):upper], col].mean(), 3)
             elif message.data.get('line_1') is not None:
-                first_val = message.data.get('line_1')
-                sec_val = message.data.get('line_2')
+                first_val = w2n.word_to_num(message.data.get('line_1'))
+                sec_val = w2n.word_to_num(message.data.get('line_2'))
                 mean = round(df.loc[df.index[[first_val, sec_val]], col].mean(), 3)
             else:
                 mean = round(df[col].mean(), 3)

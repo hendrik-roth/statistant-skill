@@ -8,6 +8,7 @@
 #   # Pip dependencies on PyPI
    python:
      - pandas
+     - word2number
 #
 #   # Install packages with the system package manager
 #   # This searches for the provided executable and uses the package names
