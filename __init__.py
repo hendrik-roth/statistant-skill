@@ -49,10 +49,11 @@ class Statistant(MycroftSkill):
                 upper = w2n.word_to_num(message.data.get('upper'))
                 # user will more likely say to index=0 row=1, etc. -> sub -1
                 mean = round(df.loc[df.index[(lower - 1):upper], col].mean(), 3)
-            elif message.data.get('line_1') is not None:
-                first_val = w2n.word_to_num(message.data.get('line_1'))
-                sec_val = w2n.word_to_num(message.data.get('line_2'))
-                mean = round(df.loc[df.index[[first_val, sec_val]], col].mean(), 3)
+            elif message.data.get('first') is not None:
+                first_val = w2n.word_to_num(message.data.get('first'))
+                sec_val = w2n.word_to_num(message.data.get('second'))
+                # user will more likely say to index=0 row=1, etc. -> sub -1
+                mean = round(df.loc[df.index[[first_val - 1, sec_val - 1]], col].mean(), 3)
             else:
                 mean = round(df[col].mean(), 3)
 
