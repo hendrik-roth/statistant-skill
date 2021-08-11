@@ -1,1 +1,1 @@
-(What is | Tell me) the average of the column {colname} (from row {lower} to {upper} | ) in {file}
+(What is | Tell me) the average of {colname} (from row {lower} to {upper} | ) in {file}
