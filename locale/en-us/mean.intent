@@ -1,1 +1,2 @@
-(What is | Tell me) the average (of row {lower} until {upper} of {colname} | of row {line_1} and {line_2} of {colname} | of {colname})  in {file}
+(What is | Tell me) the average of  (row {lower} until {upper} of {colname} | {colname})  in {file}
+(What is | Tell me) the average of row {first} and {second} of {colname} in {file}
