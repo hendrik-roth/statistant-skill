@@ -44,8 +44,8 @@ class Statistant(MycroftSkill):
             # if lower is not none -> intent with rows and other calculation, else just normal .mean calc
             if message.data.get('lower') is not None:
 
-                lower = message.data.get('lower')
-                upper = message.data.get('upper')
+                lower = int(message.data.get('lower'))
+                upper = int(message.data.get('upper'))
                 # user will more likely say to index=0 row=1, etc. -> sub -1
                 mean = round(df.loc[df.index[(lower - 1):upper], col].mean(), 3)
             else:
