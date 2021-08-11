@@ -2,7 +2,6 @@ from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_file_handler, intent_handler
 import os
 
-
 from .filehandler import FileHandler
 from .exceptions import FileNotUniqueError
 from functools import partial
@@ -48,6 +47,10 @@ class Statistant(MycroftSkill):
                 upper = int(message.data.get('upper'))
                 # user will more likely say to index=0 row=1, etc. -> sub -1
                 mean = round(df.loc[df.index[(lower - 1):upper], col].mean(), 3)
+            elif message.data.get('line_1') is not None:
+                first_val = message.data.get('line_1')
+                sec_val = message.data.get('line_2')
+                mean = round(df.loc[df.index[[first_val, sec_val]], col].mean(), 3)
             else:
                 mean = round(df[col].mean(), 3)
 
