@@ -51,7 +51,7 @@ class Statistant(MycroftSkill):
             else:
                 mean = round(df[col].mean(), 3)
 
-            self.speak_dialog('mean', {'colname': col, 'avg': mean})
+            self.speak_dialog('mean', {'avg': mean})
 
         except FileNotFoundError:
             self.speak_dialog('FileNotFound.error', {'filename': filename})
