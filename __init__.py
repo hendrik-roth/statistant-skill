@@ -3,10 +3,12 @@ from mycroft import MycroftSkill, intent_file_handler, intent_handler
 import os
 
 from word2number import w2n
+from functools import partial
+
 
 from .filehandler import FileHandler
+from .statistantcalc import StatistantCalc
 from .exceptions import FileNotUniqueError
-from functools import partial
 
 
 class Statistant(MycroftSkill):
@@ -40,22 +42,22 @@ class Statistant(MycroftSkill):
 
         try:
             file_handler = FileHandler(filename)
-            df = file_handler.content
+            calc = StatistantCalc(file_handler.content)
 
             # if lower is not none -> intent with rows and other calculation, else just normal .mean calc
             if message.data.get('lower') is not None:
 
                 lower = w2n.word_to_num(message.data.get('lower'))
                 upper = w2n.word_to_num(message.data.get('upper'))
-                # user will more likely say to index=0 row=1, etc. -> sub -1
-                mean = round(df.loc[df.index[(lower - 1):upper], col].mean(), 3)
+
+                mean = calc.mean_interval(lower, upper, col)
             elif message.data.get('first') is not None:
                 first_val = w2n.word_to_num(message.data.get('first'))
                 sec_val = w2n.word_to_num(message.data.get('second'))
-                # user will more likely say to index=0 row=1, etc. -> sub -1
-                mean = round(df.loc[df.index[[first_val - 1, sec_val - 1]], col].mean(), 3)
+
+                mean = calc.mean_2_cells(first_val, sec_val, col)
             else:
-                mean = round(df[col].mean(), 3)
+                mean = calc.mean(col)
 
             self.speak_dialog('mean', {'avg': mean})
 
@@ -64,7 +66,9 @@ class Statistant(MycroftSkill):
         except FileNotUniqueError:
             self.speak_dialog('FileNotUnique.error', {'filename': filename})
         except KeyError:
-            self.speak_dialog('Key.error', {'colname': col, 'func': func})
+            self.speak_dialog('KeyError', {'colname': col, 'func': func})
+        except IndexError:
+            self.speak_dialog('IndexError', {'func': func})
 
 
 def create_skill():
