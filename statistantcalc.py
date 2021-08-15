@@ -10,7 +10,7 @@ class StatistantCalc:
         ----------
         func
             is the function name which should be called.
-            Possible function names are: average, median, mode, variance, standard deviation, min, max
+            Possible function names are: average, median, mode, variance, standard deviation, min, max, sum
         col
             is the column which should be selected
         interval
@@ -42,6 +42,7 @@ class StatistantCalc:
             "standard deviation": df.std,
             "min": df.min,
             "max": df.max,
+            "sum": df.sum,
         }
 
         result = round(function[func](), 3)
