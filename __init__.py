@@ -1,14 +1,12 @@
-from adapt.intent import IntentBuilder
-from mycroft import MycroftSkill, intent_file_handler, intent_handler
 import os
-
-from word2number import w2n
 from functools import partial
 
+from mycroft import MycroftSkill, intent_file_handler
+from word2number import w2n
 
+from .exceptions import FileNotUniqueError
 from .filehandler import FileHandler
 from .statistantcalc import StatistantCalc
-from .exceptions import FileNotUniqueError
 
 
 class Statistant(MycroftSkill):
@@ -50,17 +48,50 @@ class Statistant(MycroftSkill):
                 lower = w2n.word_to_num(message.data.get('lower'))
                 upper = w2n.word_to_num(message.data.get('upper'))
 
-                mean = calc.mean_interval(lower, upper, col)
+                mean = calc.stats_basic(func, col, True, lower, upper)
             elif message.data.get('first') is not None:
                 first_val = w2n.word_to_num(message.data.get('first'))
                 sec_val = w2n.word_to_num(message.data.get('second'))
 
                 mean = calc.mean_2_cells(first_val, sec_val, col)
             else:
-                mean = calc.mean(col)
+                mean = calc.stats_basic(func, col)
 
             self.speak_dialog('mean', {'avg': mean})
 
+        except FileNotFoundError:
+            self.speak_dialog('FileNotFound.error', {'filename': filename})
+        except FileNotUniqueError:
+            self.speak_dialog('FileNotUnique.error', {'filename': filename})
+        except KeyError:
+            self.speak_dialog('KeyError', {'colname': col, 'func': func})
+        except IndexError:
+            self.speak_dialog('IndexError', {'func': func})
+
+    @intent_file_handler('median.intent')
+    def handle_median(self, message):
+        """
+        function for handling median intent
+
+        Parameters
+        ----------
+        message
+        """
+        func = "median"
+        filename = message.data.get('file')
+        col = message.data.get('colname').lower()
+
+        try:
+            file_handler = FileHandler(filename)
+            calc = StatistantCalc(file_handler.content)
+            if message.data.get('lower') is not None:
+                lower = w2n.word_to_num(message.data.get('lower'))
+                upper = w2n.word_to_num(message.data.get('upper'))
+
+                median = calc.stats_basic(func, col, True, lower, upper)
+            else:
+                median = calc.stats_basic(func, col)
+            self.speak_dialog('median', {'median': median})
         except FileNotFoundError:
             self.speak_dialog('FileNotFound.error', {'filename': filename})
         except FileNotUniqueError:
