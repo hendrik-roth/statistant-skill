@@ -1,0 +1,1 @@
+(Draw | Make | Create) a cluster analysis with column {colname_x} as the x-axis and column {colname_y} as the y-axis of the file {file} with {num_clusters} clusters

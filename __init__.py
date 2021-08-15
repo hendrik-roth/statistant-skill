@@ -101,6 +101,33 @@ class Statistant(MycroftSkill):
         except IndexError:
             self.speak_dialog('IndexError', {'func': func})
 
+    @intent_file_handler('cluster.intent')
+    def handle_cluster(self, message):
+        func = "cluster analysis"
+        filename = message.data.get('file')
+        x_col = message.data.get('colname_x').lower()
+        y_col = message.data.get('colname_y').lower()
+        num_clusters = message.data.get('num_clusters')
+
+        try:
+            file_handler = FileHandler(filename)
+            calc = StatistantCalc(file_handler.content)
+
+            calc.cluster(x_col, y_col, num_clusters)
+
+            self.speak_dialog('cluster', {'colname_x': x_col,
+                                          'colname_y': y_col,
+                                          'file': filename,
+                                          'num_clusters': num_clusters})
+
+        except FileNotFoundError:
+            self.speak_dialog('FileNotFound.error', {'filename': filename})
+        except FileNotUniqueError:
+            self.speak_dialog('FileNotUnique.error', {'filename': filename})
+        # todo: KeyError for x_colname and y_colname
+        except KeyError:
+            self.speak_dialog('KeyError', {'colname': col, 'func': func})
+
 
 def create_skill():
     return Statistant()

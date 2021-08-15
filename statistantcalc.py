@@ -50,3 +50,16 @@ class StatistantCalc:
     def mean_2_cells(self, val1, val2, col):
         mean = round(self.df.loc[self.df.index[[val1 - 1, val2 - 1]], col].mean(), 3)
         return mean
+
+    def cluster(self, x_col: str, y_col: str, num_clusters: int):
+
+        x_col = self.df[x_col]
+        y_col = self.df[y_col]
+
+        kmeans = KMeans(n_clusters=num_clusters).fit(df)
+
+        plt.scatter(x_col, y_col, c=kmeans.labels_.astype(float), s=70, alpha=0.5)
+        plt.scatter(centroids[:, 0], centroids[:, 1], c='red', s=50)
+        plt.legend(df["y"])
+
+        plt.savefig('/home/jannikwieland/statistant/results/test.png')
