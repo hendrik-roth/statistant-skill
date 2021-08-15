@@ -18,8 +18,8 @@ You can ask mycroft for:
 For all possible Interactions with mycroft read the wiki for [interactions](https://github.com/hendrik-roth/statistant-skill/wiki/interactions)
 
 ## Examples
-- "what is the average of the column X in the file test?"
-- "create a barchart with column X as the x-axis and column Y as the y-axis of the file test"
+- "what is the average of examplecolumn in testfile?"
+- "create a barchart with X as the x-axis and Y as the y-axis of testfile"
 
 ## Credits
 Hendrik Roth (@hendrik-roth) and Jannik Wieland (@jannikwieland)
