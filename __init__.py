@@ -107,11 +107,11 @@ class Statistant(MycroftSkill):
         filename = message.data.get('file')
         x_col = message.data.get('colname_x').lower()
         y_col = message.data.get('colname_y').lower()
-        num_clusters = message.data.get('num_clusters')
+        num_clusters = w2n.word_to_num(message.data.get('num_clusters'))
 
         try:
             file_handler = FileHandler(filename)
-            calc = StatistantCalc(file_handler.content)
+            calc = StatistantCalc(file_handler.content, filename)
 
             calc.cluster(x_col, y_col, num_clusters)
 
@@ -125,8 +125,8 @@ class Statistant(MycroftSkill):
         except FileNotUniqueError:
             self.speak_dialog('FileNotUnique.error', {'filename': filename})
         # todo: KeyError for x_colname and y_colname
-        except KeyError:
-            self.speak_dialog('KeyError', {'colname': col, 'func': func})
+        """except KeyError:
+            self.speak_dialog('KeyError', {'colname': col, 'func': func})"""
 
 
 def create_skill():

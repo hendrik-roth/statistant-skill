@@ -1,6 +1,13 @@
+from sklearn.cluster import KMeans
+import matplotlib
+import matplotlib.pyplot as plt
+matplotlib.use('Agg')
+
+
 class StatistantCalc:
-    def __init__(self, df):
+    def __init__(self, df, filename: str = None):
         self.df = df
+        self.filename = filename
 
     def stats_basic(self, func: str, col: str, interval=False, lower: int = None, upper: int = None):
         """
@@ -51,15 +58,16 @@ class StatistantCalc:
         mean = round(self.df.loc[self.df.index[[val1 - 1, val2 - 1]], col].mean(), 3)
         return mean
 
-    def cluster(self, x_col: str, y_col: str, num_clusters: int):
+    def cluster(self, x_col: str, y_col: str, num_clusters):
 
+        df = self.df
         x_col = self.df[x_col]
         y_col = self.df[y_col]
 
         kmeans = KMeans(n_clusters=num_clusters).fit(df)
+        centroids = kmeans.cluster_centers_
 
         plt.scatter(x_col, y_col, c=kmeans.labels_.astype(float), s=70, alpha=0.5)
         plt.scatter(centroids[:, 0], centroids[:, 1], c='red', s=50)
-        plt.legend(df["y"])
 
-        plt.savefig('/home/jannikwieland/statistant/results/test.png')
+        plt.savefig(f'/home/jannikwieland/statistant/results/cluster_{self.filename}.png')
