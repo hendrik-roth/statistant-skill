@@ -24,6 +24,53 @@ class Statistant(MycroftSkill):
         for path_items in map(concat_root_path, directories):
             make_directory(path_items)
 
+    def do_basic_stats(self, filename, func, col, lower, upper):
+        """
+        Function for performing basic statistical functions.
+        This function contains reading the file with FileHandler and calculating specific
+        function with StatistantCalc.
+
+        Parameters
+        ----------
+        filename
+            filename for perform calculation
+        func
+            function which should be performed
+        col
+            column of df
+        lower
+            lower value of interval. If not none, this function will perform stats func with interval,
+            else on column
+        upper
+            upper value of interval. If not none, this function will perform stats func with interval,
+            else on column
+
+        Returns
+        -------
+        result
+            Result of statistical calculation (one value)
+
+        """
+        result = None
+        try:
+            file_handler = FileHandler(filename)
+            calc = StatistantCalc(file_handler.content)
+            if lower is not None and upper is not None:
+                result = calc.stats_basic(func, col, True, lower, upper)
+            else:
+                result = calc.stats_basic(func, col)
+
+        except FileNotFoundError:
+            self.speak_dialog('FileNotFound.error', {'filename': filename})
+        except FileNotUniqueError:
+            self.speak_dialog('FileNotUnique.error', {'filename': filename})
+        except KeyError:
+            self.speak_dialog('KeyError', {'colname': col, 'func': func})
+        except IndexError:
+            self.speak_dialog('IndexError', {'func': func})
+
+        return result
+
     @intent_file_handler('mean.intent')
     def handle_mean(self, message):
         """
@@ -80,26 +127,16 @@ class Statistant(MycroftSkill):
         func = "median"
         filename = message.data.get('file')
         col = message.data.get('colname').lower()
+        lower = message.data.get('lower')
+        upper = message.data.get('upper')
 
-        try:
-            file_handler = FileHandler(filename)
-            calc = StatistantCalc(file_handler.content)
-            if message.data.get('lower') is not None:
-                lower = w2n.word_to_num(message.data.get('lower'))
-                upper = w2n.word_to_num(message.data.get('upper'))
+        if lower is not None:
+            lower = w2n.word_to_num(lower)
+            upper = w2n.word_to_num(upper)
 
-                median = calc.stats_basic(func, col, True, lower, upper)
-            else:
-                median = calc.stats_basic(func, col)
+        median = self.do_basic_stats(filename, func, col, lower, upper)
+        if median is not None:
             self.speak_dialog('median', {'median': median})
-        except FileNotFoundError:
-            self.speak_dialog('FileNotFound.error', {'filename': filename})
-        except FileNotUniqueError:
-            self.speak_dialog('FileNotUnique.error', {'filename': filename})
-        except KeyError:
-            self.speak_dialog('KeyError', {'colname': col, 'func': func})
-        except IndexError:
-            self.speak_dialog('IndexError', {'func': func})
 
 
 def create_skill():
