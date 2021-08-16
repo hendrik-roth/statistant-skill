@@ -40,8 +40,8 @@ class StatistantCalc:
             "variance": df.var,
             "mode": df.mode().to_list,
             "standard deviation": df.std,
-            "minimum": df.min,
-            "maximum": df.max,
+            "smallest value": df.min,
+            "greatest value": df.max,
             "sum": df.sum,
             "quartile range": self.iqr,
             "range": self.data_range
