@@ -89,10 +89,6 @@ class Statistant(MycroftSkill):
             else:
                 result = calc.stats_basic(func, col)
 
-        except FileNotFoundError:
-            self.speak_dialog('FileNotFound.error', {'filename': filename})
-        except FileNotUniqueError:
-            self.speak_dialog('FileNotUnique.error', {'filename': filename})
         except KeyError:
             self.speak_dialog('KeyError', {'colname': col, 'func': func})
         except IndexError:
