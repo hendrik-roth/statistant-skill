@@ -2,6 +2,7 @@ import os
 import re
 from functools import partial
 
+import inflect
 from mycroft import MycroftSkill, intent_file_handler
 from word2number import w2n
 
@@ -138,7 +139,10 @@ class Statistant(MycroftSkill):
         col = message.data.get('colname').lower()
         result = None
 
-        percentile_text = message.data.get('percentile')
+        percentile_utterance = message.data.get('percentile')
+        # fallback for first - ninth. Mycroft will not save 1st, 2nd, ... but "first", "second"...
+        ordinal_helper = self.w2ordinal(percentile_utterance)
+        percentile_text = ordinal_helper if ordinal_helper is not None else percentile_utterance
         percentile = int(re.findall(r'\d+', percentile_text)[0]) / 100
 
         lower = message.data.get('lower')
@@ -158,6 +162,18 @@ class Statistant(MycroftSkill):
             result = calc.quantiles(col, percentile)
         if result is not None:
             self.speak_dialog('quantiles', {'percentile': percentile, 'quantile': result})
+
+    @staticmethod
+    def w2ordinal(text):
+        p = inflect.engine()
+        word_to_number_mapping = {}
+
+        for i in range(1, 10):
+            word_form = p.number_to_words(i)  # 1 -> 'one'
+            ordinal_word = p.ordinal(word_form)  # 'one' -> 'first'
+            ordinal_number = p.ordinal(i)  # 1 -> '1st'
+            word_to_number_mapping[ordinal_word] = ordinal_number  # 'first': '1st'
+        return word_to_number_mapping[text] if text in word_to_number_mapping.keys() else None
 
 
 def create_skill():

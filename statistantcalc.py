@@ -73,7 +73,7 @@ class StatistantCalc:
     def quantiles(self, col, percentile, interval=False, lower: int = None, upper: int = None):
         self.do_selection(interval, col, lower, upper)
         quantile = self.selected.quantile(percentile)
-        return quantile
+        return round(quantile, 3)
 
     def do_selection(self, interval, col, lower, upper):
         if not interval:
