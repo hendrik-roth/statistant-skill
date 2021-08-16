@@ -173,7 +173,8 @@ class Statistant(MycroftSkill):
     @staticmethod
     def w2ordinal(text):
         """
-        Function for transforming a word like "first" into 1st
+        Function for transforming a word like "first" into 1st.
+        Works from "first" until "ninth"
         Parameters
         ----------
         text
