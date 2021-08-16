@@ -48,7 +48,8 @@ class StatistantCalc:
             "minimum": df.min,
             "maximum": df.max,
             "sum": df.sum,
-            "quartile range": self.iqr
+            "quartile range": self.iqr,
+            "range": self.data_range
         }
         # safe call for function chooser
         if func in function.keys():
@@ -69,3 +70,7 @@ class StatistantCalc:
         q3 = self.df.quantile(0.75)
         iqr = q3 - q1
         return iqr
+
+    def data_range(self):
+        data_range = self.df.max() - self.df.min()
+        return data_range
