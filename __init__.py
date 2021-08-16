@@ -27,6 +27,19 @@ class Statistant(MycroftSkill):
             make_directory(path_items)
 
     def init_calculator(self, filename):
+        """
+        Function for initialising StatistantCalculator.
+
+        Parameters
+        ----------
+        filename
+            is filename of file on which calculation should be performed
+
+        Returns
+        -------
+        calc
+            StatistantCalculator Object
+        """
         calc = None
         try:
             file_handler = FileHandler(filename)
