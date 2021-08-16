@@ -4,6 +4,7 @@ from .exceptions import FunctionNotFoundError
 class StatistantCalc:
     def __init__(self, df):
         self.df = df
+        self.series = None
 
     def stats_basic(self, func: str, col: str, interval=False, lower: int = None, upper: int = None):
         """
@@ -31,14 +32,14 @@ class StatistantCalc:
         """
         # .astype() for fallback for int64
         if not interval:
-            self.df = self.df[col].astype('float64')
+            self.series = self.df[col].astype('float64')
         else:
             if lower > upper:
                 lower, upper = upper, lower
             # select interval
-            self.df = self.df.loc[self.df.index[(lower - 1):upper], col].astype('float64')
+            self.series = self.df.loc[self.df.index[(lower - 1):upper], col].astype('float64')
         # function chooser
-        df = self.df
+        df = self.series
         function = {
             "average": df.mean,
             "median": df.median,
@@ -66,11 +67,11 @@ class StatistantCalc:
         return mean
 
     def iqr(self):
-        q1 = self.df.quantile(0.25)
-        q3 = self.df.quantile(0.75)
+        q1 = self.series.quantile(0.25)
+        q3 = self.series.quantile(0.75)
         iqr = q3 - q1
         return iqr
 
     def data_range(self):
-        data_range = self.df.max() - self.df.min()
+        data_range = self.series.max() - self.series.min()
         return data_range
