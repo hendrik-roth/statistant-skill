@@ -134,7 +134,13 @@ class Statistant(MycroftSkill):
 
     @intent_file_handler('quantiles.intent')
     def handle_quantile(self, message):
+        """
+        function for handling quantiles.
 
+        Parameters
+        ----------
+        message
+        """
         filename = message.data.get('file')
         col = message.data.get('colname').lower()
         result = None
@@ -155,6 +161,7 @@ class Statistant(MycroftSkill):
         calc = self.init_calculator(filename)
 
         if not 0 < percentile < 1:
+            # percentile has to be between 0 and 1
             self.speak_dialog('percentile.error')
         elif lower is not None and upper is not None:
             result = calc.quantiles(col, percentile, True, lower, upper)
@@ -165,6 +172,18 @@ class Statistant(MycroftSkill):
 
     @staticmethod
     def w2ordinal(text):
+        """
+        Function for transforming a word like "first" into 1st
+        Parameters
+        ----------
+        text
+            is the text which should be transformed
+
+        Returns
+        -------
+        word_to_number_mapping[text]
+            ordinal number of transformed text
+        """
         p = inflect.engine()
         word_to_number_mapping = {}
 
