@@ -4,7 +4,7 @@ from functools import partial
 from mycroft import MycroftSkill, intent_file_handler
 from word2number import w2n
 
-from .exceptions import FileNotUniqueError
+from .exceptions import FileNotUniqueError, FunctionNotFoundError
 from .filehandler import FileHandler
 from .statistantcalc import StatistantCalc
 
@@ -72,6 +72,8 @@ class Statistant(MycroftSkill):
             self.speak_dialog('KeyError', {'colname': col, 'func': func})
         except IndexError:
             self.speak_dialog('IndexError', {'func': func})
+        except FunctionNotFoundError:
+            self.speak_dialog('FunctionNotFound.error', {'func': func})
 
         return result
 
@@ -118,37 +120,11 @@ class Statistant(MycroftSkill):
             self.speak_dialog('KeyError', {'colname': col, 'func': func})
         except IndexError:
             self.speak_dialog('IndexError', {'func': func})
+        except FunctionNotFoundError:
+            self.speak_dialog('FunctionNotFound.error', {'func': func})
 
-    @intent_file_handler('median.intent')
-    def handle_median(self, message):
-        """
-        function for handling median intent
-
-        Parameters
-        ----------
-        message
-        """
-        func = "median"
-        median = self.handle_basic_stats(message, func)
-        if median is not None:
-            self.speak_dialog('basicstats', {'function': func, 'result': median})
-
-    @intent_file_handler('mode.intent')
-    def handle_mode(self, message):
-        """
-        function for handling mode intent
-
-        Parameters
-        ----------
-        message
-        """
-        func = "mode"
-        mode = self.handle_basic_stats(message, func)
-        if mode is not None:
-            self.speak_dialog('basicstats', {'function': func, 'result': mode})
-
-    @intent_file_handler('min.intent')
-    def handle_min(self, message):
+    @intent_file_handler('basicstats.intent')
+    def handle_statistical_basic(self, message):
         """
         function for handling minimum intent
 
@@ -156,38 +132,10 @@ class Statistant(MycroftSkill):
         ----------
         message
         """
-        func = "minimum"
-        minimum = self.handle_basic_stats(message, func)
-        if minimum is not None:
-            self.speak_dialog('basicstats', {'function': func, 'result': minimum})
-
-    @intent_file_handler('std.intent')
-    def handle_std(self, message):
-        """
-        function for handling minimum intent
-
-        Parameters
-        ----------
-        message
-        """
-        func = "standard deviation"
-        std = self.handle_basic_stats(message, func)
-        if std is not None:
-            self.speak_dialog('basicstats', {'function': func, 'result': std})
-
-    @intent_file_handler('variance.intent')
-    def handle_variance(self, message):
-        """
-        function for handling minimum intent
-
-        Parameters
-        ----------
-        message
-        """
-        func = "variance"
-        variance = self.handle_basic_stats(message, func)
-        if variance is not None:
-            self.speak_dialog('basicstats', {'function': func, 'result': variance})
+        func = message.data.get('function')
+        result = self.handle_basic_stats(message, func)
+        if result is not None:
+            self.speak_dialog('basicstats', {'function': func, 'result': result})
 
 
 def create_skill():

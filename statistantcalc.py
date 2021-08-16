@@ -1,3 +1,6 @@
+from .exceptions import FunctionNotFoundError
+
+
 class StatistantCalc:
     def __init__(self, df):
         self.df = df
@@ -26,6 +29,7 @@ class StatistantCalc:
             result (=value) of called function
 
         """
+        result = None
         # .astype() for fallback for int64
         if not interval:
             df = self.df[col].astype('float64')
@@ -45,11 +49,15 @@ class StatistantCalc:
             "maximum": df.max,
             "sum": df.sum,
         }
+        # safe call for function chooser
+        if func in function.keys():
+            result = function[func]()
+        else:
+            raise FunctionNotFoundError(f"Function {func} is not a valid function")
 
-        result = function[func]()
         # mode is a list because in some cases there can be more modes than one
         # -> mode can not be rounded because of list type
-        return result if type(result) == list else round(result, 3)
+        return result if type(result) == list or result is None else round(result, 3)
 
     def mean_2_cells(self, val1, val2, col):
         mean = round(self.df.loc[self.df.index[[val1 - 1, val2 - 1]], col].mean(), 3)
