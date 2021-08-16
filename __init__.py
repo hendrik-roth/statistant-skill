@@ -24,7 +24,7 @@ class Statistant(MycroftSkill):
         for path_items in map(concat_root_path, directories):
             make_directory(path_items)
 
-    def do_basic_stats(self, filename, func, col, lower, upper):
+    def do_basic_stats(self, message, func):
         """
         Function for performing basic statistical functions.
         This function contains reading the file with FileHandler and calculating specific
@@ -32,18 +32,8 @@ class Statistant(MycroftSkill):
 
         Parameters
         ----------
-        filename
-            filename for perform calculation
         func
-            function which should be performed
-        col
-            column of df
-        lower
-            lower value of interval. If not none, this function will perform stats func with interval,
-            else on column
-        upper
-            upper value of interval. If not none, this function will perform stats func with interval,
-            else on column
+        message
 
         Returns
         -------
@@ -52,6 +42,16 @@ class Statistant(MycroftSkill):
 
         """
         result = None
+
+        filename = message.data.get('file')
+        col = message.data.get('colname').lower()
+        lower = message.data.get('lower')
+        upper = message.data.get('upper')
+
+        if lower is not None:
+            lower = w2n.word_to_num(lower)
+            upper = w2n.word_to_num(upper)
+
         try:
             file_handler = FileHandler(filename)
             calc = StatistantCalc(file_handler.content)
@@ -125,18 +125,37 @@ class Statistant(MycroftSkill):
         message
         """
         func = "median"
-        filename = message.data.get('file')
-        col = message.data.get('colname').lower()
-        lower = message.data.get('lower')
-        upper = message.data.get('upper')
-
-        if lower is not None:
-            lower = w2n.word_to_num(lower)
-            upper = w2n.word_to_num(upper)
-
-        median = self.do_basic_stats(filename, func, col, lower, upper)
+        median = self.do_basic_stats(message, func)
         if median is not None:
             self.speak_dialog('median', {'median': median})
+
+    @intent_file_handler('mode.intent')
+    def handle_mode(self, message):
+        """
+        function for handling median intent
+
+        Parameters
+        ----------
+        message
+        """
+        func = "mode"
+        mode = self.do_basic_stats(message, func)
+        if mode is not None:
+            self.speak_dialog('mode', {'mode': mode})
+
+    @intent_file_handler('min.intent')
+    def handle_mode(self, message):
+        """
+        function for handling median intent
+
+        Parameters
+        ----------
+        message
+        """
+        func = "min"
+        mode = self.do_basic_stats(message, func)
+        if mode is not None:
+            self.speak_dialog('min', {'min': mode})
 
 
 def create_skill():

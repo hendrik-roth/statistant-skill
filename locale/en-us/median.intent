@@ -1,1 +1,1 @@
-(What is | Tell me) the median of  (row {lower} until {upper} of {colname} | {colname})  in {file}
+(What is | Tell me) the median of (row {lower} until {upper} of {colname} | {colname}) in {file}

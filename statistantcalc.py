@@ -38,15 +38,17 @@ class StatistantCalc:
             "average": df.mean,
             "median": df.median,
             "variance": df.var,
-            "mode": df.mode,
+            "mode": df.mode().to_list,
             "standard deviation": df.std,
             "min": df.min,
             "max": df.max,
             "sum": df.sum,
         }
 
-        result = round(function[func](), 3)
-        return result
+        result = function[func]()
+        # mode is a list because in some cases there can be more modes than one
+        # -> mode can not be rounded because of list type
+        return round(result, 3) if type(result) is not list else result
 
     def mean_2_cells(self, val1, val2, col):
         mean = round(self.df.loc[self.df.index[[val1 - 1, val2 - 1]], col].mean(), 3)
