@@ -26,13 +26,14 @@ class StatistantCalc:
             result (=value) of called function
 
         """
+        # .astype() for fallback for int64
         if not interval:
-            df = self.df[col]
+            df = self.df[col].astype('float64')
         else:
             if lower > upper:
                 lower, upper = upper, lower
             # select interval
-            df = self.df.loc[self.df.index[(lower - 1):upper], col]
+            df = self.df.loc[self.df.index[(lower - 1):upper], col].astype('float64')
         # function chooser
         function = {
             "average": df.mean,
@@ -40,15 +41,15 @@ class StatistantCalc:
             "variance": df.var,
             "mode": df.mode().to_list,
             "standard deviation": df.std,
-            "min": df.min,
-            "max": df.max,
+            "minimum": df.min,
+            "maximum": df.max,
             "sum": df.sum,
         }
 
         result = function[func]()
         # mode is a list because in some cases there can be more modes than one
         # -> mode can not be rounded because of list type
-        return round(result, 3) if type(result) is not list else result
+        return result if type(result) == list else round(result, 3)
 
     def mean_2_cells(self, val1, val2, col):
         mean = round(self.df.loc[self.df.index[[val1 - 1, val2 - 1]], col].mean(), 3)

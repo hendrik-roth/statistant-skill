@@ -1,0 +1,1 @@
+(what is|tell me) the standard deviation of (row {lower} until {upper} of {colname} | {colname}) in {file}
