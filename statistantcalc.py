@@ -1,13 +1,21 @@
+import os
+
 from sklearn.cluster import KMeans
+from secrets import token_hex
 import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('Agg')
 
 
 class StatistantCalc:
-    def __init__(self, df, filename: str = None):
+    def __init__(self, df, filename: str = None, func: str = None):
         self.df = df
         self.filename = filename
+        self.func = func
+
+        directory = f"statistant/results/{self.func}_{self.filename}_{token_hex(5)}.png"
+        parent_dir = os.path.expanduser("~")
+        self.path = os.path.join(parent_dir, directory)
 
     def stats_basic(self, func: str, col: str, interval=False, lower: int = None, upper: int = None):
         """
@@ -58,7 +66,7 @@ class StatistantCalc:
         mean = round(self.df.loc[self.df.index[[val1 - 1, val2 - 1]], col].mean(), 3)
         return mean
 
-    def cluster(self, x_col: str, y_col: str, num_clusters):
+    def cluster(self, x_col: str, y_col: str, num_clusters, adjustment: str = None, value=None, value_2: int = None):
 
         df = self.df
         x_col = self.df[x_col]
@@ -67,7 +75,18 @@ class StatistantCalc:
         kmeans = KMeans(n_clusters=num_clusters).fit(df)
         centroids = kmeans.cluster_centers_
 
+        if adjustment == "the title":
+            plt.title(value)
+        elif adjustment == "the axis labels":
+            plt.xlabel(value)
+            plt.ylabel(value_2)
+        elif adjustment == "the number of clusters":
+            kmeans = KMeans(n_clusters=value).fit(df)
+        else:
+            pass
+
         plt.scatter(x_col, y_col, c=kmeans.labels_.astype(float), s=70, alpha=0.5)
         plt.scatter(centroids[:, 0], centroids[:, 1], c='red', s=50)
 
-        plt.savefig(f'/home/jannikwieland/statistant/results/cluster_{self.filename}.png')
+        plt.savefig(self.path)
+        plt.clf()
