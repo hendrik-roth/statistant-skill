@@ -1,4 +1,5 @@
 import os
+import re
 from functools import partial
 
 from mycroft import MycroftSkill, intent_file_handler
@@ -23,6 +24,18 @@ class Statistant(MycroftSkill):
         make_directory = partial(os.makedirs, exist_ok=True)
         for path_items in map(concat_root_path, directories):
             make_directory(path_items)
+
+    def init_calculator(self, filename):
+        calc = None
+        try:
+            file_handler = FileHandler(filename)
+            calc = StatistantCalc(file_handler.content)
+        except FileNotFoundError:
+            self.speak_dialog('FileNotFound.error', {'filename': filename})
+        except FileNotUniqueError:
+            self.speak_dialog('FileNotUnique.error', {'filename': filename})
+
+        return calc
 
     def handle_basic_stats(self, message, func):
         """
@@ -56,8 +69,7 @@ class Statistant(MycroftSkill):
             upper = w2n.word_to_num(upper)
 
         try:
-            file_handler = FileHandler(filename)
-            calc = StatistantCalc(file_handler.content)
+            calc = self.init_calculator(filename)
             if lower is not None and upper is not None:
                 result = calc.stats_basic(func, col, True, lower, upper)
             else:
@@ -91,8 +103,7 @@ class Statistant(MycroftSkill):
         col = message.data.get('colname').lower()
 
         try:
-            file_handler = FileHandler(filename)
-            calc = StatistantCalc(file_handler.content)
+            calc = self.init_calculator(filename)
 
             first_val = w2n.word_to_num(message.data.get('first'))
             sec_val = w2n.word_to_num(message.data.get('second'))
@@ -101,10 +112,6 @@ class Statistant(MycroftSkill):
 
             self.speak_dialog('mean', {'avg': mean})
 
-        except FileNotFoundError:
-            self.speak_dialog('FileNotFound.error', {'filename': filename})
-        except FileNotUniqueError:
-            self.speak_dialog('FileNotUnique.error', {'filename': filename})
         except KeyError:
             self.speak_dialog('KeyError', {'colname': col, 'func': func})
         except IndexError:
@@ -113,7 +120,7 @@ class Statistant(MycroftSkill):
     @intent_file_handler('basicstats.intent')
     def handle_statistical_basic(self, message):
         """
-        function for handling minimum intent
+        function for handling statistical basic intent
 
         Parameters
         ----------
@@ -123,6 +130,34 @@ class Statistant(MycroftSkill):
         result = self.handle_basic_stats(message, func)
         if result is not None:
             self.speak_dialog('basicstats', {'function': func, 'result': result})
+
+    @intent_file_handler('quantiles.intent')
+    def handle_quantile(self, message):
+
+        filename = message.data.get('file')
+        col = message.data.get('colname').lower()
+        result = None
+
+        percentile_text = message.data.get('percentile')
+        percentile = int(re.findall(r'\d+', percentile_text)[0]) / 100
+
+        lower = message.data.get('lower')
+        upper = message.data.get('upper')
+
+        if lower is not None:
+            lower = w2n.word_to_num(lower)
+            upper = w2n.word_to_num(upper)
+
+        calc = self.init_calculator(filename)
+
+        if not 0 < percentile < 1:
+            self.speak_dialog('percentile.error')
+        elif lower is not None and upper is not None:
+            result = calc.quantiles(col, percentile, True, lower, upper)
+        else:
+            result = calc.quantiles(col, percentile)
+        if result is not None:
+            self.speak_dialog('quantiles', {'percentile': percentile, 'quantile': result})
 
 
 def create_skill():

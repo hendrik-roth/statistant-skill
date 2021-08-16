@@ -4,7 +4,7 @@ from .exceptions import FunctionNotFoundError
 class StatistantCalc:
     def __init__(self, df):
         self.df = df
-        self.series = None
+        self.selected = None
 
     def stats_basic(self, func: str, col: str, interval=False, lower: int = None, upper: int = None):
         """
@@ -31,15 +31,9 @@ class StatistantCalc:
 
         """
         # .astype() for fallback for int64
-        if not interval:
-            self.series = self.df[col].astype('float64')
-        else:
-            if lower > upper:
-                lower, upper = upper, lower
-            # select interval
-            self.series = self.df.loc[self.df.index[(lower - 1):upper], col].astype('float64')
+        self.do_selection(interval, col, lower, upper)
         # function chooser
-        df = self.series
+        df = self.selected
         function = {
             "average": df.mean,
             "median": df.median,
@@ -67,11 +61,25 @@ class StatistantCalc:
         return mean
 
     def iqr(self):
-        q1 = self.series.quantile(0.25)
-        q3 = self.series.quantile(0.75)
+        q1 = self.selected.quantile(0.25)
+        q3 = self.selected.quantile(0.75)
         iqr = q3 - q1
         return iqr
 
     def data_range(self):
-        data_range = self.series.max() - self.series.min()
+        data_range = self.selected.max() - self.selected.min()
         return data_range
+
+    def quantiles(self, col, percentile, interval=False, lower: int = None, upper: int = None):
+        self.do_selection(interval, col, lower, upper)
+        quantile = self.selected.quantile(percentile)
+        return quantile
+
+    def do_selection(self, interval, col, lower, upper):
+        if not interval:
+            self.selected = self.df[col].astype('float64')
+        else:
+            if lower > upper:
+                lower, upper = upper, lower
+            # select interval
+            self.selected = self.df.loc[self.df.index[(lower - 1):upper], col].astype('float64')
