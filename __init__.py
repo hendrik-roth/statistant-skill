@@ -28,8 +28,7 @@ class Statistant(MycroftSkill):
         """
         Function for performing basic statistical functions.
         This function contains extracting filename, col, lower and upper from utterance;
-        reading the file with FileHandler and calculating specific
-        function with StatistantCalc.
+        reading the file with FileHandler and calculating specific function with StatistantCalc.
 
         Parameters
         ----------

@@ -29,16 +29,16 @@ class StatistantCalc:
             result (=value) of called function
 
         """
-        result = None
         # .astype() for fallback for int64
         if not interval:
-            df = self.df[col].astype('float64')
+            self.df = self.df[col].astype('float64')
         else:
             if lower > upper:
                 lower, upper = upper, lower
             # select interval
-            df = self.df.loc[self.df.index[(lower - 1):upper], col].astype('float64')
+            self.df = self.df.loc[self.df.index[(lower - 1):upper], col].astype('float64')
         # function chooser
+        df = self.df
         function = {
             "average": df.mean,
             "median": df.median,
@@ -48,6 +48,7 @@ class StatistantCalc:
             "minimum": df.min,
             "maximum": df.max,
             "sum": df.sum,
+            "quartile range": self.iqr
         }
         # safe call for function chooser
         if func in function.keys():
@@ -62,3 +63,9 @@ class StatistantCalc:
     def mean_2_cells(self, val1, val2, col):
         mean = round(self.df.loc[self.df.index[[val1 - 1, val2 - 1]], col].mean(), 3)
         return mean
+
+    def iqr(self):
+        q1 = self.df.quantile(0.25)
+        q3 = self.df.quantile(0.75)
+        iqr = q3 - q1
+        return iqr
