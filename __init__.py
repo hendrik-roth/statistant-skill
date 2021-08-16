@@ -80,8 +80,8 @@ class Statistant(MycroftSkill):
     @intent_file_handler('mean.intent')
     def handle_mean(self, message):
         """
-        Function for handling mean intent.
-        A user can ask Mycroft for calculating the average (mean) of a column or of specific rows in a column.
+        Function for handling special mean intent.
+        A user can ask Mycroft for calculating the average (mean) of 2 specific rows in a column of a file.
 
         Parameters
         ----------
@@ -95,20 +95,10 @@ class Statistant(MycroftSkill):
             file_handler = FileHandler(filename)
             calc = StatistantCalc(file_handler.content)
 
-            # if lower is not none -> intent with rows and other calculation, else just normal .mean calc
-            if message.data.get('lower') is not None:
+            first_val = w2n.word_to_num(message.data.get('first'))
+            sec_val = w2n.word_to_num(message.data.get('second'))
 
-                lower = w2n.word_to_num(message.data.get('lower'))
-                upper = w2n.word_to_num(message.data.get('upper'))
-
-                mean = calc.stats_basic(func, col, True, lower, upper)
-            elif message.data.get('first') is not None:
-                first_val = w2n.word_to_num(message.data.get('first'))
-                sec_val = w2n.word_to_num(message.data.get('second'))
-
-                mean = calc.mean_2_cells(first_val, sec_val, col)
-            else:
-                mean = calc.stats_basic(func, col)
+            mean = calc.mean_2_cells(first_val, sec_val, col)
 
             self.speak_dialog('mean', {'avg': mean})
 
@@ -120,8 +110,6 @@ class Statistant(MycroftSkill):
             self.speak_dialog('KeyError', {'colname': col, 'func': func})
         except IndexError:
             self.speak_dialog('IndexError', {'func': func})
-        except FunctionNotFoundError:
-            self.speak_dialog('FunctionNotFound.error', {'func': func})
 
     @intent_file_handler('basicstats.intent')
     def handle_statistical_basic(self, message):
