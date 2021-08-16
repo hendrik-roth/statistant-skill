@@ -24,16 +24,20 @@ class Statistant(MycroftSkill):
         for path_items in map(concat_root_path, directories):
             make_directory(path_items)
 
-    def do_basic_stats(self, message, func):
+    def handle_basic_stats(self, message, func):
         """
         Function for performing basic statistical functions.
-        This function contains reading the file with FileHandler and calculating specific
+        This function contains extracting filename, col, lower and upper from utterance;
+        reading the file with FileHandler and calculating specific
         function with StatistantCalc.
 
         Parameters
         ----------
         func
+            Function which should be performed.
+            Possible function names are: average, median, mode, variance, standard deviation, minimum, maximum, sum
         message
+            User Utterance of intent
 
         Returns
         -------
@@ -125,7 +129,7 @@ class Statistant(MycroftSkill):
         message
         """
         func = "median"
-        median = self.do_basic_stats(message, func)
+        median = self.handle_basic_stats(message, func)
         if median is not None:
             self.speak_dialog('basicstats', {'function': func, 'result': median})
 
@@ -139,7 +143,7 @@ class Statistant(MycroftSkill):
         message
         """
         func = "mode"
-        mode = self.do_basic_stats(message, func)
+        mode = self.handle_basic_stats(message, func)
         if mode is not None:
             self.speak_dialog('basicstats', {'function': func, 'result': mode})
 
@@ -153,7 +157,7 @@ class Statistant(MycroftSkill):
         message
         """
         func = "minimum"
-        minimum = self.do_basic_stats(message, func)
+        minimum = self.handle_basic_stats(message, func)
         if minimum is not None:
             self.speak_dialog('basicstats', {'function': func, 'result': minimum})
 
@@ -167,9 +171,23 @@ class Statistant(MycroftSkill):
         message
         """
         func = "standard deviation"
-        minimum = self.do_basic_stats(message, func)
-        if minimum is not None:
-            self.speak_dialog('basicstats', {'function': func, 'result': minimum})
+        std = self.handle_basic_stats(message, func)
+        if std is not None:
+            self.speak_dialog('basicstats', {'function': func, 'result': std})
+
+    @intent_file_handler('variance.intent')
+    def handle_variance(self, message):
+        """
+        function for handling minimum intent
+
+        Parameters
+        ----------
+        message
+        """
+        func = "variance"
+        variance = self.handle_basic_stats(message, func)
+        if variance is not None:
+            self.speak_dialog('basicstats', {'function': func, 'result': variance})
 
 
 def create_skill():
