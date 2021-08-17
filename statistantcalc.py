@@ -88,7 +88,7 @@ class StatistantCalc:
         # -> mode can not be rounded because of list type
         return result if type(result) == list or result is None else round(result, 3)
 
-    def mean_2_cells(self, val1, val2, col):
+    def mean_2_cells(self, val1: int, val2: int, col: str):
         """
         function for calculating the mean of 2 cells in one column
 
@@ -135,7 +135,7 @@ class StatistantCalc:
         data_range = self.selected.max() - self.selected.min()
         return data_range
 
-    def quantiles(self, col, percentile, interval=False, lower: int = None, upper: int = None):
+    def quantiles(self, col: str, percentile: float, interval=False, lower: int = None, upper: int = None):
         """
         function for calculating quantiles
 
@@ -161,7 +161,7 @@ class StatistantCalc:
         quantile = self.selected.quantile(percentile)
         return round(quantile, 3)
 
-    def do_selection(self, col, interval=False, lower=None, upper=None):
+    def do_selection(self, col: str, interval=False, lower=None, upper=None):
         """
         functions for performing a selection of a DataFrame. Sets self.selected
 
