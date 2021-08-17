@@ -69,23 +69,35 @@ class StatistantCalc:
 
     def cluster(self, x_col: str, y_col: str, num_clusters,
                 title: str = None, x_label: str = None, y_label: str = None):
+        """
+        function for calculating, visualize and save the cluster analysis
+
+        Returns .png
+        -------
+        object
+        """
 
         df = self.df
         x_col = self.df[x_col]
         y_col = self.df[y_col]
 
+        # variables for cluster analysis
         kmeans = KMeans(n_clusters=num_clusters).fit(df)
         centroids = kmeans.cluster_centers_
 
+        # init plot
         plt.scatter(x_col, y_col, c=kmeans.labels_.astype(float), s=70, alpha=0.5)
         plt.scatter(centroids[:, 0], centroids[:, 1], c='red', s=50)
 
+        # adjustments by user
         plt.title(title)
         plt.xlabel(x_label)
         plt.ylabel(y_label)
 
+        # save plot in Directory
         plt.savefig(self.path)
         plt.clf()
 
+        # Open plot
         img = Image.open(self.path)
         img.show()

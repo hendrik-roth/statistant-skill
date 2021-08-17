@@ -105,6 +105,14 @@ class Statistant(MycroftSkill):
             self.speak_dialog('IndexError', {'func': func})
 
     def cluster_validator(self, response):
+        """
+        function to validate the possible adjustments for the cluster analysis
+
+        Returns requestet adjustments
+        -------
+        object
+        """
+
         requested_adjustments = []
         for adjustment in self.cluster_adjustments:
             if adjustment in response:
@@ -113,7 +121,16 @@ class Statistant(MycroftSkill):
 
     @intent_file_handler('cluster.intent')
     def handle_cluster(self, message):
+        """
+        function for handling cluster intent
+        A User can ask mycroft to create a cluster analysis with 2 columns
 
+        Returns the cluster analysis as a .png file
+        -------
+        object
+        """
+
+        # Init variables
         func = "clusteranalysis"
         filename = message.data.get('file')
         x_col = message.data.get('colname_x').lower()
@@ -131,10 +148,12 @@ class Statistant(MycroftSkill):
             # ask if user wants to adjust something
             want_adjustment = self.ask_yesno('want.adjustments', {'function': func, 'more': ''})
 
+            # if user asks, what he can adjust
             if want_adjustment == "what can i adjust":
                 want_adjustment = self.ask_yesno('what.can.adjust', {'adjustments': 'the title, '
                                                                                     'the axis labels, '
                                                                                     'or the number of clusters'})
+            # while user wants to adjust something
             while want_adjustment == "yes":
                 adjustment = self.get_response('what.want.to.adjust',
                                                validator=self.cluster_validator,
@@ -158,6 +177,7 @@ class Statistant(MycroftSkill):
 
                 want_adjustment = self.ask_yesno('want.adjustments', {'function': func, 'more': 'more'})
 
+            # if user don´t wants to adjust something
             if want_adjustment == "no":
                 calc.cluster(x_col, y_col, num_clusters, title, x_label, y_label)
             else:
@@ -169,6 +189,7 @@ class Statistant(MycroftSkill):
                                           'file': filename,
                                           'num_clusters': num_clusters})
 
+        # Error handling
         except FileNotFoundError:
             self.speak_dialog('FileNotFound.error', {'filename': filename})
         except FileNotUniqueError:
