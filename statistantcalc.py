@@ -1,4 +1,5 @@
 import os
+from PIL import Image
 
 from sklearn.cluster import KMeans
 from secrets import token_hex
@@ -85,3 +86,6 @@ class StatistantCalc:
 
         plt.savefig(self.path)
         plt.clf()
+
+        img = Image.open(self.path)
+        img.show()

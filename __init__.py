@@ -162,6 +162,7 @@ class Statistant(MycroftSkill):
                 calc.cluster(x_col, y_col, num_clusters, title, x_label, y_label)
             else:
                 self.speak_dialog('could.not.understand')
+                calc.cluster(x_col, y_col, num_clusters, title, x_label, y_label)
 
             self.speak_dialog('cluster', {'colname_x': x_col,
                                           'colname_y': y_col,
