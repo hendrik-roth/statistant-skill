@@ -113,45 +113,55 @@ class Statistant(MycroftSkill):
 
     @intent_file_handler('cluster.intent')
     def handle_cluster(self, message):
+
         func = "clusteranalysis"
         filename = message.data.get('file')
         x_col = message.data.get('colname_x').lower()
         y_col = message.data.get('colname_y').lower()
         num_clusters = w2n.word_to_num(message.data.get('num_clusters'))
 
+        title = None
+        x_label = None
+        y_label = None
+
         try:
             file_handler = FileHandler(filename)
             calc = StatistantCalc(file_handler.content, filename, func)
 
             # ask if user wants to adjust something
-            want_adjustment = self.ask_yesno('want.adjustments', {'function': func})
+            want_adjustment = self.ask_yesno('want.adjustments', {'function': func, 'more': ''})
 
-            # todo: while yes, multiple adjustments
-            if want_adjustment == "yes":
+            if want_adjustment == "what can i adjust":
+                want_adjustment = self.ask_yesno('what.can.adjust', {'adjustments': 'the title, '
+                                                                                    'the axis labels, '
+                                                                                    'or the number of clusters'})
+            while want_adjustment == "yes":
                 adjustment = self.get_response('what.want.to.adjust',
                                                validator=self.cluster_validator,
-                                               on_fail='cluster.adjust.fail', num_retries=2)
+                                               on_fail='adjustment.fail',
+                                               data={'adjustments': 'the title, '
+                                                                    'the axis labels or '
+                                                                    'the number of clusters',
+                                                     'optional': 'What would you like to adjust?'}, num_retries=2)
                 if adjustment == "the title":
-                    value = self.get_response('name.title')
-                    value_2 = None
+                    title = self.get_response('name.title')
                 elif adjustment == "the axis labels":
-                    value = self.get_response('name.x_axis.label')
-                    value_2 = self.get_response('name.y_axis.label')
+                    x_label = self.get_response('name.x_axis.label')
+                    y_label = self.get_response('name.y_axis.label')
                 elif adjustment == "the number of clusters":
-                    value = w2n.word_to_num(self.get_response('name.number.clusters'))
-                    value_2 = None
-                    num_clusters = value
+                    num_clusters = w2n.word_to_num(self.get_response('name.number.clusters'))
                 else:
-                    value = None
-                    value_2 = None
+                    self.speak_dialog('adjustment.fail', {'adjustments': 'the title, '
+                                                                         'the axis labels or '
+                                                                         'the number of clusters',
+                                                          'optional': ''})
 
-                calc.cluster(x_col, y_col, num_clusters, adjustment, value, value_2)
+                want_adjustment = self.ask_yesno('want.adjustments', {'function': func, 'more': 'more'})
 
-            elif want_adjustment == "no":
-                calc.cluster(x_col, y_col, num_clusters)
+            if want_adjustment == "no":
+                calc.cluster(x_col, y_col, num_clusters, title, x_label, y_label)
             else:
-                pass
-            # todo: --> what can I adjust?
+                self.speak_dialog('could.not.understand')
 
             self.speak_dialog('cluster', {'colname_x': x_col,
                                           'colname_y': y_col,
