@@ -16,6 +16,9 @@ class Statistant(MycroftSkill):
         # init Skill
         super().__init__()
 
+        # possible answers for adjustments of clusters
+        self.cluster_adjustments = ['the title', 'the axis labels', 'the number of clusters']
+
         # init directory named "statistant/source_files" in home directory if it does not exists for reading files
         # init directory named "statistant/results" in home directory if it does not exists to save results
         # directory is for reading files
@@ -206,6 +209,105 @@ class Statistant(MycroftSkill):
             ordinal_number = p.ordinal(i)  # 1 -> '1st'
             word_to_number_mapping[ordinal_word] = ordinal_number  # 'first': '1st'
         return word_to_number_mapping[text] if text in word_to_number_mapping.keys() else None
+
+    def cluster_validator(self, response):
+        """
+        function to validate the possible adjustments for the cluster analysis
+
+        Parameters
+        -------
+        response
+            response from user
+
+        Returns
+        -------
+        requested_adjustments
+            requestet adjustments of user
+        """
+
+        requested_adjustments = []
+        for adjustment in self.cluster_adjustments:
+            if adjustment in response:
+                requested_adjustments.append(adjustment)
+        return requested_adjustments
+
+    @intent_file_handler('cluster.intent')
+    def handle_cluster(self, message):
+        """
+        function for handling cluster intent.
+        A User can ask mycroft to create a cluster analysis with 2 columns.
+
+        Parameters
+        -------
+        message
+            Message Bus event information from the intent parser
+        """
+        # Init variables
+        func = "clusteranalysis"
+        filename = message.data.get('file')
+        x_col = message.data.get('colname_x').lower()
+        y_col = message.data.get('colname_y').lower()
+        num_clusters = w2n.word_to_num(message.data.get('num_clusters'))
+
+        title = None
+        x_label = None
+        y_label = None
+
+        try:
+            file_handler = FileHandler(filename)
+            calc = StatistantCalc(file_handler.content, filename, func)
+
+            # ask if user wants to adjust something
+            want_adjustment = self.ask_yesno('want.adjustments', {'function': func, 'more': ''})
+
+            # if user asks, what he can adjust
+            if want_adjustment == "what can i adjust":
+                want_adjustment = self.ask_yesno('what.can.adjust', {'adjustments': 'the title, '
+                                                                                    'the axis labels, '
+                                                                                    'or the number of clusters'})
+            # while user wants to adjust something
+            while want_adjustment == "yes":
+                adjustment = self.get_response('what.want.to.adjust',
+                                               validator=self.cluster_validator,
+                                               on_fail='adjustment.fail',
+                                               data={'adjustments': 'the title, '
+                                                                    'the axis labels or '
+                                                                    'the number of clusters',
+                                                     'optional': 'What would you like to adjust?'}, num_retries=2)
+                if adjustment == "the title":
+                    title = self.get_response('name.title')
+                elif adjustment == "the axis labels":
+                    x_label = self.get_response('name.x_axis.label')
+                    y_label = self.get_response('name.y_axis.label')
+                elif adjustment == "the number of clusters":
+                    num_clusters = w2n.word_to_num(self.get_response('name.number.clusters'))
+                else:
+                    self.speak_dialog('adjustment.fail', {'adjustments': 'the title, '
+                                                                         'the axis labels or '
+                                                                         'the number of clusters',
+                                                          'optional': ''})
+
+                want_adjustment = self.ask_yesno('want.adjustments', {'function': func, 'more': 'more'})
+
+            # if user don´t wants to adjust something
+            if want_adjustment == "no":
+                calc.cluster(x_col, y_col, num_clusters, title, x_label, y_label)
+            else:
+                self.speak_dialog('could.not.understand')
+                calc.cluster(x_col, y_col, num_clusters, title, x_label, y_label)
+
+            self.speak_dialog('cluster', {'colname_x': x_col,
+                                          'colname_y': y_col,
+                                          'file': filename,
+                                          'num_clusters': num_clusters})
+
+        # Error handling
+        except FileNotFoundError:
+            self.speak_dialog('FileNotFound.error', {'filename': filename})
+        except FileNotUniqueError:
+            self.speak_dialog('FileNotUnique.error', {'filename': filename})
+        except KeyError:
+            self.speak_dialog('KeyError', {'colname': f"{x_col} or {y_col}", 'func': func})
 
 
 def create_skill():
