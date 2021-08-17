@@ -36,6 +36,7 @@ class Statistant(MycroftSkill):
         Parameters
         ----------
         message
+            Message Bus event information from the intent parser
         """
         func = "average"
         filename = message.data.get('file')
@@ -79,6 +80,7 @@ class Statistant(MycroftSkill):
         Parameters
         ----------
         message
+            Message Bus event information from the intent parser
         """
         func = "median"
         filename = message.data.get('file')
@@ -108,9 +110,15 @@ class Statistant(MycroftSkill):
         """
         function to validate the possible adjustments for the cluster analysis
 
-        Returns requestet adjustments
+        Parameters
         -------
-        object
+        response
+            response from user
+
+        Returns
+        -------
+        requested_adjustments
+            requestet adjustments of user
         """
 
         requested_adjustments = []
@@ -122,14 +130,14 @@ class Statistant(MycroftSkill):
     @intent_file_handler('cluster.intent')
     def handle_cluster(self, message):
         """
-        function for handling cluster intent
-        A User can ask mycroft to create a cluster analysis with 2 columns
+        function for handling cluster intent.
+        A User can ask mycroft to create a cluster analysis with 2 columns.
 
-        Returns the cluster analysis as a .png file
+        Parameters
         -------
-        object
+        message
+            Message Bus event information from the intent parser
         """
-
         # Init variables
         func = "clusteranalysis"
         filename = message.data.get('file')
