@@ -10,6 +10,8 @@
      - pandas
      - word2number
      - tables
+     - sklearn
+     - matplotlib
 #
 #   # Install packages with the system package manager
 #   # This searches for the provided executable and uses the package names
