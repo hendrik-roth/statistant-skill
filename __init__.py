@@ -29,7 +29,7 @@ class Statistant(MycroftSkill):
         for path_items in map(concat_root_path, directories):
             make_directory(path_items)
 
-    def init_calculator(self, filename):
+    def init_calculator(self, filename, func=None):
         """
         Function for initialising StatistantCalculator.
 
@@ -37,6 +37,8 @@ class Statistant(MycroftSkill):
         ----------
         filename
             is filename of file on which calculation should be performed
+        func
+            function which should be performed
 
         Returns
         -------
@@ -46,7 +48,7 @@ class Statistant(MycroftSkill):
         calc = None
         try:
             file_handler = FileHandler(filename)
-            calc = StatistantCalc(file_handler.content)
+            calc = StatistantCalc(file_handler.content, filename, func)
         except FileNotFoundError:
             self.speak_dialog('FileNotFound.error', {'filename': filename})
         except FileNotUniqueError:
@@ -254,8 +256,7 @@ class Statistant(MycroftSkill):
         y_label = None
 
         try:
-            file_handler = FileHandler(filename)
-            calc = StatistantCalc(file_handler.content, filename, func)
+            calc = self.init_calculator(filename, func)
 
             # ask if user wants to adjust something
             want_adjustment = self.ask_yesno('want.adjustments', {'function': func, 'more': ''})
@@ -302,10 +303,6 @@ class Statistant(MycroftSkill):
                                           'num_clusters': num_clusters})
 
         # Error handling
-        except FileNotFoundError:
-            self.speak_dialog('FileNotFound.error', {'filename': filename})
-        except FileNotUniqueError:
-            self.speak_dialog('FileNotUnique.error', {'filename': filename})
         except KeyError:
             self.speak_dialog('KeyError', {'colname': f"{x_col} or {y_col}", 'func': func})
 

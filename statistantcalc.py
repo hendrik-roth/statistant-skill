@@ -63,7 +63,7 @@ class StatistantCalc:
 
         """
         # .astype() for fallback for int64
-        self.do_selection(interval, col, lower, upper)
+        self.do_selection(col, interval, lower, upper)
         # function chooser
         df = self.selected
         function = {
@@ -89,25 +89,93 @@ class StatistantCalc:
         return result if type(result) == list or result is None else round(result, 3)
 
     def mean_2_cells(self, val1, val2, col):
+        """
+        function for calculating the mean of 2 cells in one column
+
+        Parameters
+        ----------
+        val1
+            cell 1
+        val2
+            cell 2
+        col
+            column of the cells
+
+        Returns
+        -------
+
+        """
         mean = round(self.df.loc[self.df.index[[val1 - 1, val2 - 1]], col].mean(), 3)
         return mean
 
     def iqr(self):
+        """
+        function for calculating the inter quartile range
+
+        Returns
+        -------
+        iqr
+            inter quartile range
+        """
         q1 = self.selected.quantile(0.25)
         q3 = self.selected.quantile(0.75)
         iqr = q3 - q1
         return iqr
 
     def data_range(self):
+        """
+        function for calculating the range
+
+        Returns
+        -------
+        data_range
+            range
+
+        """
         data_range = self.selected.max() - self.selected.min()
         return data_range
 
     def quantiles(self, col, percentile, interval=False, lower: int = None, upper: int = None):
-        self.do_selection(interval, col, lower, upper)
+        """
+        function for calculating quantiles
+
+        Parameters
+        ----------
+        col
+            column on which calculation should be performed
+        percentile
+            percentile of quantile
+        interval
+            [optional] boolean if interval should be calculated
+        lower
+            [optional] lower value of interval
+        upper
+            [optional] upper value of interval
+
+        Returns
+        -------
+        quantile
+            rounded quantile (3 decimals)
+        """
+        self.do_selection(col, interval, lower, upper)
         quantile = self.selected.quantile(percentile)
         return round(quantile, 3)
 
-    def do_selection(self, interval, col, lower, upper):
+    def do_selection(self, col, interval=False, lower=None, upper=None):
+        """
+        functions for performing a selection of a DataFrame. Sets self.selected
+
+        Parameters
+        ----------
+        col
+            column which should be selected (astype float64 for better avoiding json errors)
+        interval
+            [optional] boolean if interval should be calculated
+        lower
+            [optional] lower value of interval
+        upper
+            [optional] upper value of interval
+        """
         if not interval:
             self.selected = self.df[col].astype('float64')
         else:
