@@ -107,6 +107,7 @@ class Statistant(MycroftSkill):
         Parameters
         ----------
         message
+            Message Bus event information from the intent parser
         """
         func = "average"
         filename = message.data.get('file')
@@ -135,6 +136,7 @@ class Statistant(MycroftSkill):
         Parameters
         ----------
         message
+            Message Bus event information from the intent parser
         """
         func = message.data.get('function')
         result = self.handle_basic_stats(message, func)
@@ -149,6 +151,7 @@ class Statistant(MycroftSkill):
         Parameters
         ----------
         message
+            Message Bus event information from the intent parser
         """
         filename = message.data.get('file')
         col = message.data.get('colname').lower()
