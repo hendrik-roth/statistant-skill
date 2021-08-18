@@ -334,9 +334,6 @@ class Statistant(MycroftSkill):
             calc = self.init_calculator(filename, func)
 
 
-
-
-
             self.speak_dialog('basicstats', {'chart_type': chart_type,
                                              'colname_x': x_col,
                                              'colname_y': y_col,
