@@ -6,7 +6,7 @@ import inflect
 from mycroft import MycroftSkill, intent_file_handler
 from word2number import w2n
 
-from .exceptions import FileNotUniqueError, FunctionNotFoundError
+from .exceptions import FileNotUniqueError, FunctionNotFoundError, ChartNotFoundError
 from .filehandler import FileHandler
 from .statistantcalc import StatistantCalc
 
@@ -18,8 +18,19 @@ class Statistant(MycroftSkill):
 
         # possible answers for adjustments of clusters
         self.cluster_adjustments = ['the title', 'the axis labels', 'the number of clusters']
+
+        # possible answers for adjustments of charts
         self.chart_adjustments = ['the title', 'the axis labels', 'the color', 'the scale of the axis']
+
+        # possible colors for charts
         self.colors = ['red', 'blue', 'green', 'brown', 'yellow', 'white', 'black', 'pink', 'cyan', 'magenta']
+
+        # possible chart types
+        self.chart_types = ["histogram",
+                            "bar chart", "barchart", "bar plot", "barplot",
+                            "line chart", "linechart", "line plot", "lineplot",
+                            "box plot", "boxplot", "box chart", "boxchart",
+                            "scatter plot", "scatterplot", "scatter chart", "scatterchart"]
 
         # init directory named "statistant/source_files" in home directory if it does not exists for reading files
         # init directory named "statistant/results" in home directory if it does not exists to save results
@@ -365,14 +376,6 @@ class Statistant(MycroftSkill):
         filename = message.data.get('file')
         x_col = message.data.get('colname_x').lower()
 
-        if message.data.get('colname_y') is None:
-            y_col = None
-        else:
-            y_col = message.data.get('colname_y').lower()
-
-        # todo: filter possible chart types
-        chart_type = message.data.get('chart_type').lower()
-
         title = None
         x_label = None
         y_label = None
@@ -380,69 +383,82 @@ class Statistant(MycroftSkill):
         y_lim = None
         color = None
 
-        try:
-            calc = self.init_calculator(filename, func)
+        if message.data.get('colname_y') is None:
+            y_col = None
+        else:
+            y_col = message.data.get('colname_y').lower()
 
-            # ask if user wants to adjust something
-            want_adjustment = self.ask_yesno('want.adjustments', {'function': chart_type, 'more': ''})
+        chart_type = message.data.get('chart_type').lower()
 
-            # if user asks, what he can adjust
-            if want_adjustment == "what can i adjust":
-                want_adjustment = self.ask_yesno('what.can.adjust', {'adjustments': 'the title, '
-                                                                                    'the axis labels, '
-                                                                                    'the color or '
-                                                                                    'the scale of the axis'})
+        if chart_type in self.chart_types:
 
-            while want_adjustment == "yes":
-                adjustment = self.get_response('what.want.to.adjust',
-                                               validator=self.charts_validator,
-                                               on_fail='adjustment.fail',
-                                               data={'adjustments': 'the title, '
-                                                                    'the axis labels, '
-                                                                    'the color or '
-                                                                    'the scale of the axis',
-                                                     'optional': 'What would you like to adjust?'}, num_retries=2)
-                if adjustment == "the title":
-                    title = self.get_response('name.title')
-                elif adjustment == "the axis labels":
-                    x_label = self.get_response('name.x_axis.label')
-                    y_label = self.get_response('name.y_axis.label')
-                elif adjustment == "the color":
-                    color = self.get_response('name.color', {'chart_type': chart_type},
-                                              validator=self.color_validator,
-                                              on_fail='color.fail',
-                                              num_retries=2)
-                elif adjustment == "the scale of the axis":
-                    # todo: scale axis adjustment
-                    pass
+            try:
+                calc = self.init_calculator(filename, func)
+
+                # ask if user wants to adjust something
+                want_adjustment = self.ask_yesno('want.adjustments', {'function': chart_type, 'more': ''})
+
+                # if user asks, what he can adjust
+                if want_adjustment == "what can i adjust":
+                    want_adjustment = self.ask_yesno('what.can.adjust', {'adjustments': 'the title, '
+                                                                                        'the axis labels, '
+                                                                                        'the color or '
+                                                                                        'the scale of the axis'})
+
+                while want_adjustment == "yes":
+                    adjustment = self.get_response('what.want.to.adjust',
+                                                   validator=self.charts_validator,
+                                                   on_fail='adjustment.fail',
+                                                   data={'adjustments': 'the title, '
+                                                                        'the axis labels, '
+                                                                        'the color or '
+                                                                        'the scale of the axis',
+                                                         'optional': 'What would you like to adjust?'}, num_retries=2)
+                    if adjustment == "the title":
+                        title = self.get_response('name.title')
+                    elif adjustment == "the axis labels":
+                        x_label = self.get_response('name.x_axis.label')
+                        y_label = self.get_response('name.y_axis.label')
+                    elif adjustment == "the color":
+                        color = self.get_response('name.color', {'chart_type': chart_type},
+                                                  validator=self.color_validator,
+                                                  on_fail='color.fail',
+                                                  num_retries=2)
+                    elif adjustment == "the scale of the axis":
+                        # todo: scale axis adjustment
+                        pass
+                    else:
+                        self.speak_dialog('adjustment.fail', {'adjustments': 'the title, '
+                                                                             'the axis labels, '
+                                                                             'the color or '
+                                                                             'the scale of the axis',
+                                                              'optional': ''})
+
+                    want_adjustment = self.ask_yesno('want.adjustments', {'function': chart_type, 'more': 'more'})
+
+                if want_adjustment == "no":
+                    calc.charts(chart_type, x_col, y_col, title, x_label, y_label, x_lim, y_lim, color)
                 else:
-                    self.speak_dialog('adjustment.fail', {'adjustments': 'the title, '
-                                                                         'the axis labels, '
-                                                                         'the color or '
-                                                                         'the scale of the axis',
-                                                          'optional': ''})
+                    self.speak_dialog('could.not.understand')
+                    calc.charts(chart_type, x_col, y_col, title, x_label, y_label, x_lim, y_lim, color)
 
-                want_adjustment = self.ask_yesno('want.adjustments', {'function': chart_type, 'more': 'more'})
+                if y_col is None:
+                    self.speak_dialog('charts.one.column', {'chart_type': chart_type,
+                                                            'colname_x': x_col,
+                                                            'file': filename})
+                else:
+                    self.speak_dialog('charts', {'chart_type': chart_type,
+                                                 'colname_x': x_col,
+                                                 'colname_y': y_col,
+                                                 'file': filename})
 
-            if want_adjustment == "no":
-                calc.charts(chart_type, x_col, y_col, title, x_label, y_label, x_lim, y_lim, color)
-            else:
-                self.speak_dialog('could.not.understand')
-                calc.charts(chart_type, x_col, y_col, title, x_label, y_label, x_lim, y_lim, color)
-
-            if y_col is None:
-                self.speak_dialog('charts.one.column', {'chart_type': chart_type,
-                                                        'colname_x': x_col,
-                                                        'file': filename})
-            else:
-                self.speak_dialog('charts', {'chart_type': chart_type,
-                                             'colname_x': x_col,
-                                             'colname_y': y_col,
-                                             'file': filename})
-
-        # Error handling
-        except KeyError:
-            self.speak_dialog('KeyError', {'colname': f"{x_col} or {y_col}", 'func': func})
+            # Error handling
+            except KeyError:
+                self.speak_dialog('KeyError', {'colname': f"{x_col} or {y_col}", 'func': func})
+            except ChartNotFoundError:
+                self.speak_dialog('ChartNotFound.error', {'chart_type': chart_type})
+        else:
+            self.speak_dialog('ChartNotFound.error', {'chart_type': chart_type})
 
 
 def create_skill():
