@@ -4,3 +4,7 @@ class FileNotUniqueError(Exception):
 
 class FunctionNotFoundError(Exception):
     pass
+
+
+class ChartNotFoundError(Exception):
+    pass

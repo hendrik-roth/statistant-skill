@@ -8,7 +8,8 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 import seaborn as sns
 
-from .exceptions import FunctionNotFoundError
+from .exceptions import FunctionNotFoundError, ChartNotFoundError
+
 matplotlib.use('Agg')
 
 
@@ -185,16 +186,16 @@ class StatistantCalc:
             # select interval
             self.selected = self.df.loc[self.df.index[(lower - 1):upper], col].astype('float64')
 
-    def cluster(self, x_col: str, y_col: str, num_clusters: int,
+    def cluster(self, x_colname: str, y_colname: str, num_clusters: int,
                 title: str = None, x_label: str = None, y_label: str = None):
         """
         function for calculating, visualize and save the cluster analysis
 
         Parameters
         -------
-        x_col
+        x_colname
             is the column which should be selected for the x-axis
-        y_col
+        y_colname
             is the column which should be selected for the y-axis
         num_clusters
             number of cluster which should be used for cluster analysis
@@ -207,8 +208,8 @@ class StatistantCalc:
         """
 
         df = self.df
-        x_col = self.df[x_col]
-        y_col = self.df[y_col]
+        x_col = self.df[x_colname]
+        y_col = self.df[y_colname]
 
         # variables for cluster analysis
         kmeans = KMeans(n_clusters=num_clusters).fit(df)
@@ -230,16 +231,16 @@ class StatistantCalc:
         # Open plot
         self.open_file(self.path)
 
-    def charts(self, x_col: str, y_col: str, chart: str,
+    def charts(self, chart: str, x_colname: str, y_colname: str = None,
                title: str = None, x_label: str = None, y_label: str = None, x_lim=None, y_lim=None, color=None):
         """
         function for calculating, visualize and save the cluster analysis
 
         Parameters
         -------
-        x_col
+        x_colname
             is the column which should be selected for the x-axis
-        y_col
+        y_colname
             is the column which should be selected for the y-axis
         chart
             chart type which should be used for the plot
@@ -258,18 +259,24 @@ class StatistantCalc:
         """
 
         df = self.df
-        x_col = self.df[x_col]
-        y_col = self.df[y_col]
+        x_col = self.df[x_colname]
+        if y_colname is None:
+            y_col = y_colname
+        else:
+            y_col = self.df[y_colname]
 
-        chart_type = {
-            "histogram": sns.histplot(data=df, x=x_col, y=y_col, color=color),
-            "bar chart": sns.histplot(data=df, x=x_col, y=y_col, color=color),
-            "variance": sns.histplot(data=df, x=x_col, y=y_col, color=color),
-            "mode": sns.histplot(data=df, x=x_col, y=y_col, color=color),
-            "standard deviation": sns.histplot(data=df, x=x_col, y=y_col, color=color)
-        }
-
-        sns.histplot(data=df, x="x", y="house", color=None)
+        if chart == "histogram":
+            sns.histplot(data=df, x=x_col, y=y_col, color=color),
+        elif chart in ["bar chart", "barchart", "bar plot", "barplot"]:
+            sns.barplot(data=df, x=x_col, y=y_col, color=color),
+        elif chart in ["line chart", "linechart", "line plot", "lineplot"]:
+            sns.lineplot(data=df, x=x_col, y=y_col, color=color),
+        elif chart in ["box plot", "boxplot", "box chart", "boxchart"]:
+            sns.boxplot(data=df, x=x_col, y=y_col, color=color),
+        elif chart in ["scatter plot", "scatterplot", "scatter chart", "scatterchart"]:
+            sns.scatterplot(data=df, x=x_col, y=y_col, color=color)
+        else:
+            raise ChartNotFoundError(f"{chart} is not a valid charttype")
 
         plt.title(title)
 
