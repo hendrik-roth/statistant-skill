@@ -251,6 +251,7 @@ class Statistant(MycroftSkill):
         """
         function for handling cluster intent.
         A User can ask mycroft to create a cluster analysis with 2 columns.
+        The User can do several adjustments on the cluster analysis.
 
         Parameters
         -------
@@ -364,7 +365,9 @@ class Statistant(MycroftSkill):
     @intent_file_handler('charts.intent')
     def handle_charts(self, message):
         """
-        function for handling charts intent
+        Function for performing chart visualizations.
+        This function contains extracting filename, columns and adjustments;
+        reading the file with FileHandler and calculating specific charts.
 
         Parameters
         ----------
