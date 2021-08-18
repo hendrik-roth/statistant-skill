@@ -29,7 +29,7 @@ class Statistant(MycroftSkill):
         for path_items in map(concat_root_path, directories):
             make_directory(path_items)
 
-    def init_calculator(self, filename, func=None):
+    def init_calculator(self, filename, func=None) -> StatistantCalc:
         """
         Function for initialising StatistantCalculator.
 
@@ -158,6 +158,7 @@ class Statistant(MycroftSkill):
         message
             Message Bus event information from the intent parser
         """
+        func = "quantile"
         filename = message.data.get('file')
         col = message.data.get('colname').lower()
         result = None
@@ -176,14 +177,16 @@ class Statistant(MycroftSkill):
             upper = w2n.word_to_num(upper)
 
         calc = self.init_calculator(filename)
-
-        if not 0 < percentile < 1:
-            # percentile has to be between 0 and 1
-            self.speak_dialog('percentile.error')
-        elif lower is not None and upper is not None:
-            result = calc.quantiles(col, percentile, True, lower, upper)
-        else:
-            result = calc.quantiles(col, percentile)
+        try:
+            if not 0 < percentile < 1:
+                # percentile has to be between 0 and 1
+                self.speak_dialog('percentile.error')
+            elif lower is not None and upper is not None:
+                result = calc.quantiles(col, percentile, True, lower, upper)
+            else:
+                result = calc.quantiles(col, percentile)
+        except KeyError:
+            self.speak_dialog("KeyError", {"colname": col, "func": func})
         if result is not None:
             self.speak_dialog('quantiles', {'percentile': percentile, 'quantile': result})
 
@@ -305,6 +308,73 @@ class Statistant(MycroftSkill):
         # Error handling
         except KeyError:
             self.speak_dialog('KeyError', {'colname': f"{x_col} or {y_col}", 'func': func})
+
+    @intent_file_handler('frequency.intent')
+    def handle_frequency(self, message):
+
+        filename = message.data.get('file')
+        col = message.data.get('colname').lower()
+        val = message.data.get('val')
+        frequency_type = message.data.get('freq_kind')
+
+        func = f"{frequency_type} frequency"
+
+        result = None
+        try:
+            value = w2n.word_to_num(val)
+            calc = self.init_calculator(filename)
+            result = calc.frequency(value, col, frequency_type)
+        except ValueError:
+            self.speak_dialog("ValueError")
+
+        if result is not None:
+            self.speak_dialog("basicstats", {"function": func, "result": result})
+
+    @intent_file_handler('quartile.intent')
+    def handle_quartile(self, message):
+        """
+        function for handling quartile.
+
+        Parameters
+        ----------
+        message
+            Message Bus event information from the intent parser
+        """
+        func = "quartile"
+        filename = message.data.get('file')
+        col = message.data.get('colname').lower()
+        lower = message.data.get('lower')
+        upper = message.data.get('upper')
+        result = None
+
+        which_quartile = message.data.get('which_quartile')
+
+        percentile = None
+        if which_quartile == "first":
+            percentile = 0.25
+        elif which_quartile == "second" or which_quartile == "2nd":
+            percentile = 0.5
+        elif which_quartile == "third" or which_quartile == "3rd":
+            percentile = 0.75
+
+        if lower is not None:
+            lower = w2n.word_to_num(lower)
+            upper = w2n.word_to_num(upper)
+
+        calc = self.init_calculator(filename)
+
+        try:
+            if percentile is None:
+                # percentile has to be between 0 and 1
+                self.speak_dialog('quartile.error')
+            elif lower is not None and upper is not None:
+                result = calc.quantiles(col, percentile, True, lower, upper)
+            else:
+                result = calc.quantiles(col, percentile)
+        except KeyError:
+            self.speak_dialog("KeyError", {"colname": col, "func": func})
+        if result is not None:
+            self.speak_dialog('quartile', {'which_quartile': which_quartile, 'result': result})
 
 
 def create_skill():
