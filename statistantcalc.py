@@ -231,6 +231,10 @@ class StatistantCalc:
         # Open plot
         self.open_file(self.path)
 
+    def frequency(self, val: int, col: str, kind: str = "absolute"):
+        return round(self.df[col].value_counts()[val].astype("float64"), 3) if kind == "absolute" else round(
+            self.df[col].value_counts()[val].astype("float64") / len(self.df[col]), 3)
+
     def charts(self, chart: str, x_colname: str, y_colname: str = None,
                title: str = None, x_label: str = None, y_label: str = None, x_lim=None, y_lim=None, color=None):
         """

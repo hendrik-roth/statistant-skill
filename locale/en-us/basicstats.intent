@@ -1,1 +1,1 @@
-(what is|tell me) the {function} of (row {lower} until {upper} of {colname}|{colname}) in {file}
+(what is|tell me) the {function} of (row {lower} until (row |){upper} of (the column |){colname}|(the column |){colname}) in (the file|){file}
