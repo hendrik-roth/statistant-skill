@@ -7,6 +7,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
+from .exceptions import FunctionNotFoundError
 matplotlib.use('Agg')
 
 
@@ -15,6 +16,7 @@ class StatistantCalc:
         self.df = df
         self.filename = filename
         self.func = func
+        self.selected = None
 
         directory = f"statistant/results/{self.func}_{self.filename}_{token_hex(5)}.png"
         parent_dir = os.path.expanduser("~")
@@ -44,7 +46,7 @@ class StatistantCalc:
         ----------
         func
             is the function name which should be called.
-            Possible function names are: average, median, mode, variance, standard deviation, min, max
+            Possible function names are: average, median, mode, variance, standard deviation, min, max, sum
         col
             is the column which should be selected
         interval
@@ -60,30 +62,127 @@ class StatistantCalc:
             result (=value) of called function
 
         """
-        if not interval:
-            df = self.df[col]
-        else:
-            if lower > upper:
-                lower, upper = upper, lower
-            # select interval
-            df = self.df.loc[self.df.index[(lower - 1):upper], col]
+        # .astype() for fallback for int64
+        self.do_selection(col, interval, lower, upper)
         # function chooser
+        df = self.selected
         function = {
             "average": df.mean,
             "median": df.median,
             "variance": df.var,
-            "mode": df.mode,
+            "mode": df.mode().to_list,
             "standard deviation": df.std,
-            "min": df.min,
-            "max": df.max,
+            "smallest value": df.min,
+            "top value": df.max,
+            "sum": df.sum,
+            "quartile range": self.iqr,
+            "range": self.data_range
         }
+        # safe call for function chooser
+        if func in function.keys():
+            result = function[func]()
+        else:
+            raise FunctionNotFoundError(f"Function {func} is not a valid function")
 
-        result = round(function[func](), 3)
-        return result
+        # mode is a list because in some cases there can be more modes than one
+        # -> mode can not be rounded because of list type
+        return result if type(result) == list or result is None else round(result, 3)
 
-    def mean_2_cells(self, val1, val2, col):
+    def mean_2_cells(self, val1: int, val2: int, col: str):
+        """
+        function for calculating the mean of 2 cells in one column
+
+        Parameters
+        ----------
+        val1
+            cell 1
+        val2
+            cell 2
+        col
+            column of the cells
+
+        Returns
+        -------
+
+        """
         mean = round(self.df.loc[self.df.index[[val1 - 1, val2 - 1]], col].mean(), 3)
         return mean
+
+    def iqr(self):
+        """
+        function for calculating the inter quartile range
+
+        Returns
+        -------
+        iqr
+            inter quartile range
+        """
+        q1 = self.selected.quantile(0.25)
+        q3 = self.selected.quantile(0.75)
+        iqr = q3 - q1
+        return iqr
+
+    def data_range(self):
+        """
+        function for calculating the range
+
+        Returns
+        -------
+        data_range
+            range
+
+        """
+        data_range = self.selected.max() - self.selected.min()
+        return data_range
+
+    def quantiles(self, col: str, percentile: float, interval=False, lower: int = None, upper: int = None):
+        """
+        function for calculating quantiles
+
+        Parameters
+        ----------
+        col
+            column on which calculation should be performed
+        percentile
+            percentile of quantile
+        interval
+            [optional] boolean if interval should be calculated
+        lower
+            [optional] lower value of interval
+        upper
+            [optional] upper value of interval
+
+        Returns
+        -------
+        quantile
+            rounded quantile (3 decimals)
+        """
+        self.do_selection(col, interval, lower, upper)
+        quantile = self.selected.quantile(percentile)
+        return round(quantile, 3)
+
+    def do_selection(self, col: str, interval=False, lower=None, upper=None):
+        """
+        functions for performing a selection of a DataFrame. Sets self.selected
+
+        Parameters
+        ----------
+        col
+            column which should be selected (astype float64 for better avoiding json errors)
+        interval
+            [optional] boolean if interval should be calculated
+        lower
+            [optional] lower value of interval
+        upper
+            [optional] upper value of interval
+        """
+        if not interval:
+            self.selected = self.df[col].astype('float64')
+        else:
+            if lower > upper:
+                lower, upper = upper, lower
+            # select interval
+            self.selected = self.df.loc[self.df.index[(lower - 1):upper], col].astype('float64')
 
     def cluster(self, x_col: str, y_col: str, num_clusters: int,
                 title: str = None, x_label: str = None, y_label: str = None):
