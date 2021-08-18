@@ -6,6 +6,7 @@ from secrets import token_hex
 import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
+import seaborn as sns
 
 from .exceptions import FunctionNotFoundError
 matplotlib.use('Agg')
@@ -221,6 +222,62 @@ class StatistantCalc:
         plt.title(title)
         plt.xlabel(x_label)
         plt.ylabel(y_label)
+
+        # save plot in Directory
+        plt.savefig(self.path)
+        plt.clf()
+
+        # Open plot
+        self.open_file(self.path)
+
+    def charts(self, x_col: str, y_col: str, chart: str,
+               title: str = None, x_label: str = None, y_label: str = None, x_lim=None, y_lim=None, color=None):
+        """
+        function for calculating, visualize and save the cluster analysis
+
+        Parameters
+        -------
+        x_col
+            is the column which should be selected for the x-axis
+        y_col
+            is the column which should be selected for the y-axis
+        chart
+            chart type which should be used for the plot
+        title
+            [optional] title for plot
+        x_label
+            [optional] label for x-axis of plot
+        y_label
+            [optional] label for y-axis of plot
+        x_lim
+            [optional] limits for x-axis scale
+        y_lim
+            [optional] limits for y-axis scale
+        color
+            [optional] color for the plot
+        """
+
+        df = self.df
+        x_col = self.df[x_col]
+        y_col = self.df[y_col]
+
+        chart_type = {
+            "histogram": sns.histplot(data=df, x=x_col, y=y_col, color=color),
+            "bar chart": sns.histplot(data=df, x=x_col, y=y_col, color=color),
+            "variance": sns.histplot(data=df, x=x_col, y=y_col, color=color),
+            "mode": sns.histplot(data=df, x=x_col, y=y_col, color=color),
+            "standard deviation": sns.histplot(data=df, x=x_col, y=y_col, color=color)
+        }
+
+        sns.histplot(data=df, x="x", y="house", color=None)
+
+        plt.title(title)
+
+        plt.xlabel(x_label)
+        plt.ylabel(y_label)
+
+        plt.xlim(x_lim)
+        plt.ylim(y_lim)
 
         # save plot in Directory
         plt.savefig(self.path)

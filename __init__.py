@@ -306,6 +306,46 @@ class Statistant(MycroftSkill):
         except KeyError:
             self.speak_dialog('KeyError', {'colname': f"{x_col} or {y_col}", 'func': func})
 
+    @intent_file_handler('charts.intent')
+    def handle_charts(self, message):
+        """
+        function for handling charts intent
+
+        Parameters
+        ----------
+        message
+            Message Bus event information from the intent parser
+        """
+
+        func = "clusteranalysis"
+        filename = message.data.get('file')
+        x_col = message.data.get('colname_x').lower()
+        y_col = message.data.get('colname_y').lower()
+
+        chart_type = message.data.get('chart_type')
+
+        title = None
+        x_label = None
+        y_label = None
+        x_lim = None
+        y_lim = None
+
+        try:
+            calc = self.init_calculator(filename, func)
+
+
+
+
+
+            self.speak_dialog('basicstats', {'chart_type': chart_type,
+                                             'colname_x': x_col,
+                                             'colname_y': y_col,
+                                             'file': filename})
+
+        # Error handling
+        except KeyError:
+            self.speak_dialog('KeyError', {'colname': f"{x_col} or {y_col}", 'func': func})
+
 
 def create_skill():
     return Statistant()

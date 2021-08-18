@@ -1,0 +1,1 @@
+(draw | make | create) a {chart_type} with {colname_x} as x and {colname_y} as y of (the file|) {file}
