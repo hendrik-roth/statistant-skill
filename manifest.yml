@@ -13,6 +13,7 @@
      - sklearn
      - matplotlib
      - inflect
+     - seaborn
 #
 #   # Install packages with the system package manager
 #   # This searches for the provided executable and uses the package names

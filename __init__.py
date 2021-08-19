@@ -6,7 +6,7 @@ import inflect
 from mycroft import MycroftSkill, intent_file_handler
 from word2number import w2n
 
-from .exceptions import FileNotUniqueError, FunctionNotFoundError
+from .exceptions import FileNotUniqueError, FunctionNotFoundError, ChartNotFoundError
 from .filehandler import FileHandler
 from .statistantcalc import StatistantCalc
 
@@ -18,6 +18,19 @@ class Statistant(MycroftSkill):
 
         # possible answers for adjustments of clusters
         self.cluster_adjustments = ['the title', 'the axis labels', 'the number of clusters']
+
+        # possible answers for adjustments of charts
+        self.chart_adjustments = ['the title', 'the axis labels', 'the color', 'the scale of the axis']
+
+        # possible colors for charts
+        self.colors = ['red', 'blue', 'green', 'brown', 'yellow', 'white', 'black', 'pink', 'cyan', 'magenta']
+
+        # possible chart types
+        self.chart_types = ["histogram",
+                            "bar chart", "barchart", "bar plot", "barplot",
+                            "line chart", "linechart", "line plot", "lineplot",
+                            "box plot", "boxplot", "box chart", "boxchart",
+                            "scatter plot", "scatterplot", "scatter chart", "scatterchart"]
 
         # init directory named "statistant/source_files" in home directory if it does not exists for reading files
         # init directory named "statistant/results" in home directory if it does not exists to save results
@@ -241,6 +254,7 @@ class Statistant(MycroftSkill):
         """
         function for handling cluster intent.
         A User can ask mycroft to create a cluster analysis with 2 columns.
+        The User can do several adjustments on the cluster analysis.
 
         Parameters
         -------
@@ -308,6 +322,149 @@ class Statistant(MycroftSkill):
         # Error handling
         except KeyError:
             self.speak_dialog('KeyError', {'colname': f"{x_col} or {y_col}", 'func': func})
+
+    def charts_validator(self, response):
+        """
+        function to validate the possible adjustments for the charts
+
+        Parameters
+        -------
+        response
+            response from user
+
+        Returns
+        -------
+        requested_adjustments
+            requestet adjustments of user
+        """
+
+        requested_adjustments = []
+        for adjustment in self.chart_adjustments:
+            if adjustment in response:
+                requested_adjustments.append(adjustment)
+        return requested_adjustments
+
+    def color_validator(self, response):
+        """
+        function to validate the possible colors for seaborn plots
+
+        Parameters
+        -------
+        response
+            response from user
+
+        Returns
+        -------
+        colors
+            requestet colors of user
+        """
+
+        requested_colors = []
+        for color in self.colors:
+            if color in response:
+                requested_colors.append(color)
+        return requested_colors
+
+    @intent_file_handler('charts.intent')
+    def handle_charts(self, message):
+        """
+        Function for performing chart visualizations.
+        This function contains extracting filename, columns and adjustments;
+        reading the file with FileHandler and calculating specific charts.
+
+        Parameters
+        ----------
+        message
+            Message Bus event information from the intent parser
+        """
+
+        func = "clusteranalysis"
+        filename = message.data.get('file')
+        x_col = message.data.get('colname_x').lower()
+
+        title = None
+        x_label = None
+        y_label = None
+        x_lim = None
+        y_lim = None
+        color = None
+
+        if message.data.get('colname_y') is None:
+            y_col = None
+        else:
+            y_col = message.data.get('colname_y').lower()
+
+        chart_type = message.data.get('chart_type').lower()
+
+        if chart_type in self.chart_types:
+
+            try:
+                calc = self.init_calculator(filename, func)
+
+                # ask if user wants to adjust something
+                want_adjustment = self.ask_yesno('want.adjustments', {'function': chart_type, 'more': ''})
+
+                # if user asks, what he can adjust
+                if want_adjustment == "what can i adjust":
+                    want_adjustment = self.ask_yesno('what.can.adjust', {'adjustments': 'the title, '
+                                                                                        'the axis labels, '
+                                                                                        'the color or '
+                                                                                        'the scale of the axis'})
+
+                while want_adjustment == "yes":
+                    adjustment = self.get_response('what.want.to.adjust',
+                                                   validator=self.charts_validator,
+                                                   on_fail='adjustment.fail',
+                                                   data={'adjustments': 'the title, '
+                                                                        'the axis labels, '
+                                                                        'the color or '
+                                                                        'the scale of the axis',
+                                                         'optional': 'What would you like to adjust?'}, num_retries=2)
+                    if adjustment == "the title":
+                        title = self.get_response('name.title')
+                    elif adjustment == "the axis labels":
+                        x_label = self.get_response('name.x_axis.label')
+                        y_label = self.get_response('name.y_axis.label')
+                    elif adjustment == "the color":
+                        color = self.get_response('name.color', {'chart_type': chart_type},
+                                                  validator=self.color_validator,
+                                                  on_fail='color.fail',
+                                                  num_retries=2)
+                    elif adjustment == "the scale of the axis":
+                        # todo: scale axis adjustment
+                        pass
+                    else:
+                        self.speak_dialog('adjustment.fail', {'adjustments': 'the title, '
+                                                                             'the axis labels, '
+                                                                             'the color or '
+                                                                             'the scale of the axis',
+                                                              'optional': ''})
+
+                    want_adjustment = self.ask_yesno('want.adjustments', {'function': chart_type, 'more': 'more'})
+
+                if want_adjustment == "no":
+                    calc.charts(chart_type, x_col, y_col, title, x_label, y_label, x_lim, y_lim, color)
+                else:
+                    self.speak_dialog('could.not.understand')
+                    calc.charts(chart_type, x_col, y_col, title, x_label, y_label, x_lim, y_lim, color)
+
+                if y_col is None:
+                    self.speak_dialog('charts.one.column', {'chart_type': chart_type,
+                                                            'colname_x': x_col,
+                                                            'file': filename})
+                else:
+                    self.speak_dialog('charts', {'chart_type': chart_type,
+                                                 'colname_x': x_col,
+                                                 'colname_y': y_col,
+                                                 'file': filename})
+
+            # Error handling
+            except KeyError:
+                self.speak_dialog('KeyError', {'colname': f"{x_col} or {y_col}", 'func': func})
+            except ChartNotFoundError:
+                self.speak_dialog('ChartNotFound.error', {'chart_type': chart_type})
+        else:
+            self.speak_dialog('ChartNotFound.error', {'chart_type': chart_type})
 
     @intent_file_handler('frequency.intent')
     def handle_frequency(self, message):

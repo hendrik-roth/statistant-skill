@@ -6,8 +6,9 @@ from secrets import token_hex
 import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
+import seaborn as sns
 
-from .exceptions import FunctionNotFoundError
+from .exceptions import FunctionNotFoundError, ChartNotFoundError
 
 matplotlib.use('Agg')
 
@@ -185,16 +186,16 @@ class StatistantCalc:
             # select interval
             self.selected = self.df.loc[self.df.index[(lower - 1):upper], col].astype('float64')
 
-    def cluster(self, x_col: str, y_col: str, num_clusters: int,
+    def cluster(self, x_colname: str, y_colname: str, num_clusters: int,
                 title: str = None, x_label: str = None, y_label: str = None):
         """
         function for calculating, visualize and save the cluster analysis
 
         Parameters
         -------
-        x_col
+        x_colname
             is the column which should be selected for the x-axis
-        y_col
+        y_colname
             is the column which should be selected for the y-axis
         num_clusters
             number of cluster which should be used for cluster analysis
@@ -207,8 +208,8 @@ class StatistantCalc:
         """
 
         df = self.df
-        x_col = self.df[x_col]
-        y_col = self.df[y_col]
+        x_col = self.df[x_colname]
+        y_col = self.df[y_colname]
 
         # variables for cluster analysis
         kmeans = KMeans(n_clusters=num_clusters).fit(df)
@@ -233,3 +234,65 @@ class StatistantCalc:
     def frequency(self, val: int, col: str, kind: str = "absolute"):
         return round(self.df[col].value_counts()[val].astype("float64"), 3) if kind == "absolute" else round(
             self.df[col].value_counts()[val].astype("float64") / len(self.df[col]), 3)
+
+    def charts(self, chart: str, x_colname: str, y_colname: str = None,
+               title: str = None, x_label: str = None, y_label: str = None, x_lim=None, y_lim=None, color=None):
+        """
+        function for calculating, visualize and save the cluster analysis
+
+        Parameters
+        -------
+        x_colname
+            is the column which should be selected for the x-axis
+        y_colname
+            is the column which should be selected for the y-axis
+        chart
+            chart type which should be used for the plot
+        title
+            [optional] title for plot
+        x_label
+            [optional] label for x-axis of plot
+        y_label
+            [optional] label for y-axis of plot
+        x_lim
+            [optional] limits for x-axis scale
+        y_lim
+            [optional] limits for y-axis scale
+        color
+            [optional] color for the plot
+        """
+
+        df = self.df
+        x_col = self.df[x_colname]
+        if y_colname is None:
+            y_col = y_colname
+        else:
+            y_col = self.df[y_colname]
+
+        if chart == "histogram":
+            sns.histplot(data=df, x=x_col, y=y_col, color=color),
+        elif chart in ["bar chart", "barchart", "bar plot", "barplot"]:
+            sns.barplot(data=df, x=x_col, y=y_col, color=color),
+        elif chart in ["line chart", "linechart", "line plot", "lineplot"]:
+            sns.lineplot(data=df, x=x_col, y=y_col, color=color),
+        elif chart in ["box plot", "boxplot", "box chart", "boxchart"]:
+            sns.boxplot(data=df, x=x_col, y=y_col, color=color),
+        elif chart in ["scatter plot", "scatterplot", "scatter chart", "scatterchart"]:
+            sns.scatterplot(data=df, x=x_col, y=y_col, color=color)
+        else:
+            raise ChartNotFoundError(f"{chart} is not a valid charttype")
+
+        plt.title(title)
+
+        plt.xlabel(x_label)
+        plt.ylabel(y_label)
+
+        plt.xlim(x_lim)
+        plt.ylim(y_lim)
+
+        # save plot in Directory
+        plt.savefig(self.path)
+        plt.clf()
+
+        # Open plot
+        self.open_file(self.path)
