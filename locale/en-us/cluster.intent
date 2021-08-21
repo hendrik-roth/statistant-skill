@@ -1,1 +1,1 @@
-(Draw | Make | Create) a cluster analysis with (column|) {colname_x} as x and (column|) {colname_y} as y of (the file|) {file} with {num_clusters} clusters
+(make | do) a cluster analysis  of (the file|) {file} with {num_clusters} clusters

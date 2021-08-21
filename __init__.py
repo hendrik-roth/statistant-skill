@@ -264,9 +264,10 @@ class Statistant(MycroftSkill):
         # Init variables
         func = "clusteranalysis"
         filename = message.data.get('file')
-        x_col = message.data.get('colname_x').lower()
-        y_col = message.data.get('colname_y').lower()
         num_clusters = w2n.word_to_num(message.data.get('num_clusters'))
+
+        x_col = self.get_response('get.x-axis')
+        y_col = self.get_response('get.y-axis')
 
         title = None
         x_label = None
@@ -378,9 +379,8 @@ class Statistant(MycroftSkill):
             Message Bus event information from the intent parser
         """
 
-        func = "clusteranalysis"
+        func = "chart"
         filename = message.data.get('file')
-        x_col = message.data.get('colname_x').lower()
 
         title = None
         x_label = None
@@ -389,14 +389,17 @@ class Statistant(MycroftSkill):
         y_lim = None
         color = None
 
-        if message.data.get('colname_y') is None:
-            y_col = None
-        else:
-            y_col = message.data.get('colname_y').lower()
-
         chart_type = message.data.get('chart_type').lower()
 
         if chart_type in self.chart_types:
+
+            x_col = self.get_response('get.x-axis')
+            y_col = self.get_response('get.y-axis')
+
+            if x_col is None or x_col == "none":
+                x_col = None
+            elif y_col is None or y_col == "none":
+                y_col = None
 
             try:
                 calc = self.init_calculator(filename, func)
@@ -451,6 +454,12 @@ class Statistant(MycroftSkill):
                 if y_col is None:
                     self.speak_dialog('charts.one.column', {'chart_type': chart_type,
                                                             'colname_x': x_col,
+                                                            'axis': 'x axis',
+                                                            'file': filename})
+                elif x_col is None:
+                    self.speak_dialog('charts.one.column', {'chart_type': chart_type,
+                                                            'colname_x': y_col,
+                                                            'axis': 'y axis',
                                                             'file': filename})
                 else:
                     self.speak_dialog('charts', {'chart_type': chart_type,
@@ -460,7 +469,7 @@ class Statistant(MycroftSkill):
 
             # Error handling
             except KeyError:
-                self.speak_dialog('KeyError', {'colname': f"{x_col} or {y_col}", 'func': func})
+                self.speak_dialog('KeyError', {'colname': f"{x_col} or {y_col}", 'func': chart_type})
             except ChartNotFoundError:
                 self.speak_dialog('ChartNotFound.error', {'chart_type': chart_type})
         else:
