@@ -445,7 +445,8 @@ class Statistant(MycroftSkill):
 
                     want_adjustment = self.ask_yesno('want.adjustments', {'function': chart_type, 'more': 'more'})
 
-                if want_adjustment == "no":
+                if \
+                        want_adjustment == "no":
                     calc.charts(chart_type, x_col, y_col, title, x_label, y_label, x_lim, y_lim, color)
                 else:
                     self.speak_dialog('could.not.understand')
@@ -454,12 +455,12 @@ class Statistant(MycroftSkill):
                 if y_col is None:
                     self.speak_dialog('charts.one.column', {'chart_type': chart_type,
                                                             'colname_x': x_col,
-                                                            'axis': 'x-axis',
+                                                            'axis': 'x axis',
                                                             'file': filename})
                 elif x_col is None:
                     self.speak_dialog('charts.one.column', {'chart_type': chart_type,
                                                             'colname_x': y_col,
-                                                            'axis': 'why-axis',
+                                                            'axis': 'y axis',
                                                             'file': filename})
                 else:
                     self.speak_dialog('charts', {'chart_type': chart_type,
