@@ -235,7 +235,7 @@ class StatistantCalc:
         return round(self.df[col].value_counts()[val].astype("float64"), 3) if kind == "absolute" else round(
             self.df[col].value_counts()[val].astype("float64") / len(self.df[col]), 3)
 
-    def charts(self, chart: str, x_colname: str, y_colname: str = None,
+    def charts(self, chart: str, x_colname: str = None, y_colname: str = None,
                title: str = None, x_label: str = None, y_label: str = None, x_lim=None, y_lim=None, color=None):
         """
         function for calculating, visualize and save the cluster analysis
@@ -263,11 +263,16 @@ class StatistantCalc:
         """
 
         df = self.df
-        x_col = self.df[x_colname]
+
         if y_colname is None:
             y_col = y_colname
+            x_col = self.df[x_colname]
+        elif x_colname is None:
+            x_col = x_colname
+            y_col = self.df[y_colname]
         else:
             y_col = self.df[y_colname]
+            x_col = self.df[x_colname]
 
         if chart == "histogram":
             sns.histplot(data=df, x=x_col, y=y_col, color=color),
