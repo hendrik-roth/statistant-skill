@@ -20,7 +20,7 @@ class Statistant(MycroftSkill):
         self.cluster_adjustments = ['the title', 'the axis labels', 'the number of clusters']
 
         # possible answers for adjustments of charts
-        self.chart_adjustments = ['the title', 'the axis labels', 'the color', 'the scale of the axis']
+        self.chart_adjustments = ['the title', 'the axis labels', 'the color', 'the scale of x', 'the scale pf y']
 
         # possible colors for charts
         self.colors = ['red', 'blue', 'green', 'brown', 'yellow', 'white', 'black', 'pink', 'cyan', 'magenta']
@@ -411,8 +411,9 @@ class Statistant(MycroftSkill):
                 if want_adjustment == "what can i adjust":
                     want_adjustment = self.ask_yesno('what.can.adjust', {'adjustments': 'the title, '
                                                                                         'the axis labels, '
-                                                                                        'the color or '
-                                                                                        'the scale of the axis'})
+                                                                                        'the color, '
+                                                                                        'the scale of x or '
+                                                                                        'the scale of y'})
 
                 while want_adjustment == "yes":
                     adjustment = self.get_response('what.want.to.adjust',
@@ -420,8 +421,9 @@ class Statistant(MycroftSkill):
                                                    on_fail='adjustment.fail',
                                                    data={'adjustments': 'the title, '
                                                                         'the axis labels, '
-                                                                        'the color or '
-                                                                        'the scale of the axis',
+                                                                        'the color, '
+                                                                        'the scale of x or '
+                                                                        'the scale of y',
                                                          'optional': 'What would you like to adjust?'}, num_retries=2)
                     if adjustment == "the title":
                         title = self.get_response('name.title')
@@ -433,14 +435,24 @@ class Statistant(MycroftSkill):
                                                   validator=self.color_validator,
                                                   on_fail='color.fail',
                                                   num_retries=2)
-                    elif adjustment == "the scale of the axis":
-                        # todo: scale axis adjustment
-                        pass
+                    elif adjustment == "the scale of x":
+                        x_lim_lower = w2n.word_to_num(self.get_response('name.axis_lim',
+                                                                        {'lower_upper': 'lower', 'axis': 'x-axis'}))
+                        x_lim_upper = w2n.word_to_num(self.get_response('name.axis_lim',
+                                                                        {'lower_upper': 'upper', 'axis': 'x-axis'}))
+                        x_lim = [x_lim_lower, x_lim_upper]
+                    elif adjustment == "the scale of y":
+                        y_lim_lower = w2n.word_to_num(self.get_response('name.axis_lim',
+                                                                        {'lower_upper': 'lower', 'axis': 'y-axis'}))
+                        y_lim_upper = w2n.word_to_num(self.get_response('name.axis_lim',
+                                                                        {'lower_upper': 'upper', 'axis': 'y-axis'}))
+                        y_lim = [y_lim_lower, y_lim_upper]
                     else:
                         self.speak_dialog('adjustment.fail', {'adjustments': 'the title, '
                                                                              'the axis labels, '
-                                                                             'the color or '
-                                                                             'the scale of the axis',
+                                                                             'the color, '
+                                                                             'the scale of x or '
+                                                                             'the scale of y',
                                                               'optional': ''})
 
                     want_adjustment = self.ask_yesno('want.adjustments', {'function': chart_type, 'more': 'more'})
