@@ -292,8 +292,10 @@ class StatistantCalc:
         plt.xlabel(x_label)
         plt.ylabel(y_label)
 
-        plt.xlim(x_lim)
-        plt.ylim(y_lim)
+        if x_lim is not None:
+            plt.xlim(x_lim[0], x_lim[1])
+        if y_lim is not None:
+            plt.ylim(y_lim[0], y_lim[1])
 
         # save plot in Directory
         plt.savefig(self.path)
