@@ -5,8 +5,8 @@ from secrets import token_hex
 
 import matplotlib
 import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
 import seaborn as sns
+from sklearn.cluster import KMeans
 
 from .exceptions import FunctionNotFoundError, ChartNotFoundError
 
@@ -303,3 +303,7 @@ class StatistantCalc:
 
         # Open plot
         self.open_file(self.path)
+
+    def simple_regression(self, kind: str, x_col, y_col):
+        # TODO statsmodel regression
+        pass

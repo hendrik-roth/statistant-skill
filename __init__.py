@@ -554,6 +554,17 @@ class Statistant(MycroftSkill):
         if result is not None:
             self.speak_dialog('quartile', {'which_quartile': which_quartile, 'result': result})
 
+    @intent_file_handler('simpleRegression.intent')
+    def handle_simple_regression(self, message):
+        model_kind = message.data.get('regression_kind')
+        x_col = message.data.get('x_colname')
+        y_col = message.data.get('y_colname')
+        filename = message.data.get('file')
+
+        calc = self.init_calculator(filename, model_kind)
+        calc.simple_regression(model_kind, x_col, y_col)
+        self.speak_dialog('regression', {'regression_kind': model_kind})
+
 
 def create_skill():
     return Statistant()
