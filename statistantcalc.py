@@ -6,6 +6,8 @@ from secrets import token_hex
 import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
+import statsmodels.api as sm
+import statsmodels.formula.api as ols
 from sklearn.cluster import KMeans
 
 from .exceptions import FunctionNotFoundError, ChartNotFoundError
@@ -305,5 +307,12 @@ class StatistantCalc:
         self.open_file(self.path)
 
     def simple_regression(self, kind: str, x_col, y_col):
-        # TODO statsmodel regression
+        formula = f"{y_col}~{x_col}"
+        if kind == "logistic":
+            model = ols.logit(data=self.df, formula=formula).fit()
+        else:
+            model = ols.ols(data=self.df, formula=formula).fit()
+        fig = sm.graphics.plot_ccpr(model, ax=x_col)
+        model.summary()
+
         pass
