@@ -1,21 +1,19 @@
 import os
 import subprocess
 import sys
+from io import BytesIO
 from secrets import token_hex
 
 import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
-import statsmodels.api as sm
-import statsmodels.formula.api as ols
+import statsmodels.api as smodels
+import statsmodels.formula.api as sm
 from sklearn.cluster import KMeans
-
-from io import BytesIO
-from reportlab.pdfgen import canvas
-from reportlab.graphics import renderPDF
 from svglib.svglib import svg2rlg
 
 from .exceptions import FunctionNotFoundError, ChartNotFoundError
+from .report import ReportGenerator
 
 matplotlib.use('Agg')
 
@@ -317,26 +315,28 @@ class StatistantCalc:
     def simple_regression(self, kind: str, x_col, y_col):
         formula = f"{y_col}~{x_col}"
         if kind == "logistic":
-            model = ols.logit(data=self.df, formula=formula).fit()
+            # TODO prepare Data for logistic reg (0<y<1)
+            model = sm.logit(data=self.df, formula=formula).fit()  # logistic regression
         else:
-            model = ols.ols(data=self.df, formula=formula).fit()
-        fig = sm.graphics.plot_regress_exog(model, x_col)
+            model = sm.ols(data=self.df, formula=formula).fit()  # linear regression
+
+        # plot regression
+        fig = plt.figure(figsize=(6, 5))
+        smodels.graphics.plot_regress_exog(model, x_col, fig=fig)
         fig.tight_layout(pad=1.0)
 
-        # save plot in Directory
-        imgdata = BytesIO()
-
-        fig.savefig(imgdata, format='svg')
+        # save plot for report
+        img_data = BytesIO()
+        fig.savefig(img_data, format='svg')
         plt.clf()
+        img_data.seek(0)  # rewind the data
 
-        imgdata.seek(0)  # rewind the data
+        drawing = svg2rlg(img_data)  # convert svg to drawing
+        summary = model.summary().as_text()
 
-        drawing = svg2rlg(imgdata)
+        # generate report
+        report = ReportGenerator(self.pdf_path)
+        report.create_reg_report(drawing, summary)
 
-        c = canvas.Canvas(self.pdf_path)
-        renderPDF.draw(drawing, c, 10, 375)
-        c.drawString(10, 200, f"summary")
-        c.showPage()
-        c.save()
-        # Open plot
+        # Open report
         self.open_file(self.pdf_path)

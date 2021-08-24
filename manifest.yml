@@ -15,6 +15,7 @@
      - inflect
      - seaborn
      - statsmodels
+     - reportlab
 #
 #   # Install packages with the system package manager
 #   # This searches for the provided executable and uses the package names
