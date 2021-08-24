@@ -10,6 +10,11 @@ import statsmodels.api as sm
 import statsmodels.formula.api as ols
 from sklearn.cluster import KMeans
 
+from io import BytesIO
+from reportlab.pdfgen import canvas
+from reportlab.graphics import renderPDF
+from svglib.svglib import svg2rlg
+
 from .exceptions import FunctionNotFoundError, ChartNotFoundError
 
 matplotlib.use('Agg')
@@ -25,6 +30,9 @@ class StatistantCalc:
         directory = f"statistant/results/{self.func}_{self.filename}_{token_hex(5)}.png"
         parent_dir = os.path.expanduser("~")
         self.path = os.path.join(parent_dir, directory)
+
+        pdf_dir = f"statistant/results/{self.func}_{self.filename}_{token_hex(5)}.pdf"
+        self.pdf_path = os.path.join(parent_dir, pdf_dir)
 
     @staticmethod
     def open_file(filepath):
@@ -312,7 +320,23 @@ class StatistantCalc:
             model = ols.logit(data=self.df, formula=formula).fit()
         else:
             model = ols.ols(data=self.df, formula=formula).fit()
-        fig = sm.graphics.plot_ccpr(model, ax=x_col)
-        model.summary()
+        fig = sm.graphics.plot_regress_exog(model, x_col)
+        fig.tight_layout(pad=1.0)
 
-        pass
+        # save plot in Directory
+        imgdata = BytesIO()
+
+        fig.savefig(imgdata, format='svg')
+        plt.clf()
+
+        imgdata.seek(0)  # rewind the data
+
+        drawing = svg2rlg(imgdata)
+
+        c = canvas.Canvas(self.pdf_path)
+        renderPDF.draw(drawing, c, 10, 375)
+        c.drawString(10, 200, f"summary")
+        c.showPage()
+        c.save()
+        # Open plot
+        self.open_file(self.pdf_path)
