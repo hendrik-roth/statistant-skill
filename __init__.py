@@ -592,14 +592,19 @@ class Statistant(MycroftSkill):
 
         calc = self.init_calculator(filename, model_kind)
         # TODO error handling (KeyError)
-        model = calc.simple_regression(model_kind, x_col, y_col)
+        model = None
+        try:
+            model = calc.simple_regression(model_kind, x_col, y_col)
+        except KeyError:
+            self.speak_dialog("KeyError", {"colname": f"{x_col} or column {y_col}", "func": func})
 
-        # create report and open it
-        report_generator = ReportGenerator(func, filename)
-        report_generator.create_reg_report(model, x_col)
-        self.open_file(report_generator.output_path)
+        if model is not None:
+            # create report and open it
+            report_generator = ReportGenerator(func, filename)
+            report_generator.create_reg_report(model, x_col)
+            self.open_file(report_generator.output_path)
 
-        self.speak_dialog('regression', {'regression_kind': model_kind})
+            self.speak_dialog('regression', {'regression_kind': model_kind})
 
 
 def create_skill():

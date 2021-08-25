@@ -326,6 +326,9 @@ class StatistantCalc:
             regression model
 
         """
+        if x_col not in self.df.columns or y_col not in self.df.columns:
+            raise KeyError
+
         formula = f"{y_col}~{x_col}"
         if kind == "logistic":
             # TODO prepare Data for logistic reg (0<y<1)
