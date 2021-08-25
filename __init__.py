@@ -588,7 +588,7 @@ class Statistant(MycroftSkill):
         y_col = message.data.get('y_colname')
         filename = message.data.get('file')
 
-        func = f"{model_kind} regression"
+        func = f"{model_kind}-regression"
 
         calc = self.init_calculator(filename, model_kind)
         # TODO error handling (KeyError)
