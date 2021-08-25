@@ -591,7 +591,7 @@ class Statistant(MycroftSkill):
         func = f"{model_kind}-regression"
 
         calc = self.init_calculator(filename, model_kind)
-        # TODO error handling (KeyError)
+
         model = None
         try:
             model = calc.simple_regression(model_kind, x_col, y_col)
