@@ -1,19 +1,15 @@
 import os
 import subprocess
 import sys
-from io import BytesIO
 from secrets import token_hex
 
 import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
-import statsmodels.api as smodels
 import statsmodels.formula.api as sm
 from sklearn.cluster import KMeans
-from svglib.svglib import svg2rlg
 
 from .exceptions import FunctionNotFoundError, ChartNotFoundError
-from .report import ReportGenerator
 
 matplotlib.use('Agg')
 
@@ -313,6 +309,23 @@ class StatistantCalc:
         self.open_file(self.path)
 
     def simple_regression(self, kind: str, x_col, y_col):
+        """
+        function for performing a simple regression
+
+        Parameters
+        ----------
+        kind
+            kind of regression (linear or logistic)
+        x_col
+            column name of x
+        y_col
+            column name of y
+        Returns
+        -------
+        model
+            regression model
+
+        """
         formula = f"{y_col}~{x_col}"
         if kind == "logistic":
             # TODO prepare Data for logistic reg (0<y<1)
@@ -320,23 +333,4 @@ class StatistantCalc:
         else:
             model = sm.ols(data=self.df, formula=formula).fit()  # linear regression
 
-        # plot regression
-        fig = plt.figure(figsize=(6, 5))
-        smodels.graphics.plot_regress_exog(model, x_col, fig=fig)
-        fig.tight_layout(pad=1.0)
-
-        # save plot for report
-        img_data = BytesIO()
-        fig.savefig(img_data, format='svg')
-        plt.clf()
-        img_data.seek(0)  # rewind the data
-
-        drawing = svg2rlg(img_data)  # convert svg to drawing
-        summary = model.summary().as_text()
-
-        # generate report
-        report = ReportGenerator(self.pdf_path)
-        report.create_reg_report(drawing, summary)
-
-        # Open report
-        self.open_file(self.pdf_path)
+        return model
