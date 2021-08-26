@@ -597,6 +597,8 @@ class Statistant(MycroftSkill):
             model = calc.simple_regression(model_kind, x_col, y_col)
         except KeyError:
             self.speak_dialog("KeyError", {"colname": f"{x_col} or column {y_col}", "func": func})
+        except ValueError:
+            self.speak_dialog("logisticRegError", {"colname": y_col})
 
         if model is not None:
             # create report and open it
