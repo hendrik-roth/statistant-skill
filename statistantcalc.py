@@ -331,8 +331,12 @@ class StatistantCalc:
 
         formula = f"{y_col}~{x_col}"
         if kind == "logistic":
-            # TODO prepare Data for logistic reg (0<y<1)
-            model = sm.logit(data=self.df, formula=formula).fit()  # logistic regression
+            # check if values for y are all between 0 and 1
+            between = self.df[y_col].between(0, 1).all()
+            if not between:
+                raise ValueError('values of y are not between 0 and 1')
+            else:
+                model = sm.logit(data=self.df, formula=formula).fit()  # logistic regression
         else:
             model = sm.ols(data=self.df, formula=formula).fit()  # linear regression
 
