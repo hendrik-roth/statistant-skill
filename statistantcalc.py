@@ -340,3 +340,39 @@ class StatistantCalc:
             model = sm.ols(data=self.df, formula=formula).fit()  # linear regression
 
         return model
+
+    def multiple_regression(self, kind: str, x_cols, y_col):
+        """
+        function for performing a simple regression
+
+        Parameters
+        ----------
+        kind
+            kind of regression (linear or logistic)
+        x_cols
+            column names of x
+        y_col
+            column name of y
+        Returns
+        -------
+        model
+            regression model
+
+        """
+        column_check = [x for x in x_cols if x in self.df.columns]
+        if not column_check or y_col not in self.df.columns:
+            raise KeyError('columns do not exist')
+
+        x_formula = "+".join(x_cols)
+
+        formula = f"{y_col}~{x_formula}"
+        if kind == "logistic":
+            # check if values for y are all between 0 and 1
+            between = self.df[y_col].between(0, 1).all()
+            if not between:
+                raise ValueError(f'values of {y_col} are not between 0 and 1')
+            model = sm.mnlogit(data=self.df, formula=formula).fit()  # logistic regression
+        else:
+            model = sm.ols(data=self.df, formula=formula).fit()  # linear regression
+
+        return model

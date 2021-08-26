@@ -588,7 +588,7 @@ class Statistant(MycroftSkill):
         y_col = message.data.get('y_colname')
         filename = message.data.get('file')
 
-        func = f"{model_kind}-regression"
+        func = f"simple-{model_kind}-regression"
 
         calc = self.init_calculator(filename, model_kind)
 
@@ -603,7 +603,44 @@ class Statistant(MycroftSkill):
         if model is not None:
             # create report and open it
             report_generator = ReportGenerator(func, filename)
-            report_generator.create_reg_report(model, x_col)
+            report_generator.create_reg_report(model, list(x_col), func)
+            self.open_file(report_generator.output_path)
+
+            self.speak_dialog('regression', {'regression_kind': model_kind})
+
+    @intent_file_handler('multipleRegression.intent')
+    def handle_multiple_regression(self, message):
+        """
+        function for handling multiple regression intents
+
+        Parameters
+        ----------
+        message
+            Message Bus event information from the intent parser
+        """
+        model_kind = message.data.get('regression_kind')
+        x_cols = message.data.get('x_colnames')
+        y_col = message.data.get('y_colname')
+        filename = message.data.get('file')
+
+        func = f"multiple-{model_kind}-regression"
+
+        calc = self.init_calculator(filename, model_kind)
+
+        model = None
+        # prepare x data
+        x_list = x_cols.split()
+        try:
+            model = calc.multiple_regression(model_kind, x_list, y_col)
+        except KeyError:
+            self.speak_dialog("KeyError", {"colname": f"{x_cols} or column {y_col}", "func": func})
+        except ValueError:
+            self.speak_dialog("logisticRegError", {"colname": y_col})
+
+        if model is not None:
+            # create report and open it
+            report_generator = ReportGenerator(func, filename)
+            report_generator.create_reg_report(model, x_list, func)
             self.open_file(report_generator.output_path)
 
             self.speak_dialog('regression', {'regression_kind': model_kind})
