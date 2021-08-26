@@ -1,0 +1,1 @@
+(create | do) a multiple {regression_kind} regression(| model) with {x_colnames} as x and {y_colname} as y of (the file|) {file}

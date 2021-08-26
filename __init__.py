@@ -1,5 +1,7 @@
 import os
 import re
+import subprocess
+import sys
 from functools import partial
 
 import inflect
@@ -8,6 +10,7 @@ from word2number import w2n
 
 from .exceptions import FileNotUniqueError, FunctionNotFoundError, ChartNotFoundError
 from .filehandler import FileHandler
+from .report import ReportGenerator
 from .statistantcalc import StatistantCalc
 
 
@@ -68,6 +71,22 @@ class Statistant(MycroftSkill):
             self.speak_dialog('FileNotUnique.error', {'filename': filename})
 
         return calc
+
+    @staticmethod
+    def open_file(filepath):
+        """
+        function for open files in Directory
+
+        Parameters
+        -------
+        filepath
+            path of file which should be opened
+        """
+        if sys.platform == "win32":
+            os.startfile(filepath)
+        else:
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, filepath])
 
     def handle_basic_stats(self, message, func):
         """
@@ -553,6 +572,78 @@ class Statistant(MycroftSkill):
             self.speak_dialog("KeyError", {"colname": col, "func": func})
         if result is not None:
             self.speak_dialog('quartile', {'which_quartile': which_quartile, 'result': result})
+
+    @intent_file_handler('simpleRegression.intent')
+    def handle_simple_regression(self, message):
+        """
+        function for handling simple regression intents
+
+        Parameters
+        ----------
+        message
+            Message Bus event information from the intent parser
+        """
+        model_kind = message.data.get('regression_kind')
+        x_col = message.data.get('x_colname')
+        y_col = message.data.get('y_colname')
+        filename = message.data.get('file')
+
+        func = f"simple-{model_kind}-regression"
+
+        calc = self.init_calculator(filename, model_kind)
+
+        model = None
+        try:
+            model = calc.simple_regression(model_kind, x_col, y_col)
+        except KeyError:
+            self.speak_dialog("KeyError", {"colname": f"{x_col} or column {y_col}", "func": func})
+        except ValueError:
+            self.speak_dialog("logisticRegError", {"colname": y_col})
+
+        if model is not None:
+            # create report and open it
+            report_generator = ReportGenerator(func, filename)
+            report_generator.create_reg_report(model, list(x_col), func)
+            self.open_file(report_generator.output_path)
+
+            self.speak_dialog('regression', {'regression_kind': model_kind})
+
+    @intent_file_handler('multipleRegression.intent')
+    def handle_multiple_regression(self, message):
+        """
+        function for handling multiple regression intents
+
+        Parameters
+        ----------
+        message
+            Message Bus event information from the intent parser
+        """
+        model_kind = message.data.get('regression_kind')
+        x_cols = message.data.get('x_colnames')
+        y_col = message.data.get('y_colname')
+        filename = message.data.get('file')
+
+        func = f"multiple-{model_kind}-regression"
+        self.speak_dialog("regression.wait", {"reg_kind": func})
+        calc = self.init_calculator(filename, model_kind)
+
+        model = None
+        # prepare x data
+        x_list = x_cols.split()
+        try:
+            model = calc.multiple_regression(model_kind, x_list, y_col)
+        except KeyError:
+            self.speak_dialog("KeyError", {"colname": f"{x_cols} or column {y_col}", "func": func})
+        except ValueError:
+            self.speak_dialog("logisticRegError", {"colname": y_col})
+
+        if model is not None:
+            # create report and open it
+            report_generator = ReportGenerator(func, filename)
+            report_generator.create_reg_report(model, x_list, func)
+            self.open_file(report_generator.output_path)
+
+            self.speak_dialog('regression', {'regression_kind': model_kind})
 
 
 def create_skill():

@@ -1,0 +1,1 @@
+(create | do) a simple {regression_kind} regression(| model) with {x_colname} as x and {y_colname} as y of (the file|) {file}
