@@ -335,8 +335,7 @@ class StatistantCalc:
             between = self.df[y_col].between(0, 1).all()
             if not between:
                 raise ValueError('values of y are not between 0 and 1')
-            else:
-                model = sm.logit(data=self.df, formula=formula).fit()  # logistic regression
+            model = sm.logit(data=self.df, formula=formula).fit()  # logistic regression
         else:
             model = sm.ols(data=self.df, formula=formula).fit()  # linear regression
 
