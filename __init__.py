@@ -624,7 +624,7 @@ class Statistant(MycroftSkill):
         filename = message.data.get('file')
 
         func = f"multiple-{model_kind}-regression"
-
+        self.speak_dialog("regression.wait", {"reg_kind": func})
         calc = self.init_calculator(filename, model_kind)
 
         model = None
