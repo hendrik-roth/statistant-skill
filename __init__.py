@@ -74,7 +74,7 @@ class Statistant(MycroftSkill):
         return calc
 
     @staticmethod
-    def save_file(func, filename, filetype):
+    def get_file_path(func, filename, filetype):
 
         directory = f"statistant/results/{func}_{filename}_{token_hex(5)}.{filetype}"
         parent_dir = os.path.expanduser("~")
@@ -417,7 +417,7 @@ class Statistant(MycroftSkill):
         y_lim = None
         color = None
 
-        path = self.save_file(func, filename, "png")
+        path = self.get_file_path(func, filename, "png")
 
         chart_type = message.data.get('chart_type').lower()
 

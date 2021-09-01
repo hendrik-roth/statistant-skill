@@ -275,28 +275,30 @@ class StatistantCalc:
             y_col = self.df[y_colname]
             x_col = self.df[x_colname]
 
+        fig, ax = plt.subplots()
+
         if chart == "histogram":
-            fig, ax = sns.histplot(data=df, x=x_col, y=y_col, color=color)
+            ax = sns.histplot(data=df, x=x_col, y=y_col, color=color)
         elif chart in ["bar chart", "barchart", "bar plot", "barplot"]:
-            fig, ax = sns.barplot(data=df, x=x_col, y=y_col, color=color)
+            ax = sns.barplot(data=df, x=x_col, y=y_col, color=color)
         elif chart in ["line chart", "linechart", "line plot", "lineplot"]:
-            fig, ax = sns.lineplot(data=df, x=x_col, y=y_col, color=color)
+            ax = sns.lineplot(data=df, x=x_col, y=y_col, color=color)
         elif chart in ["box plot", "boxplot", "box chart", "boxchart"]:
-            fig, ax = sns.boxplot(data=df, x=x_col, y=y_col, color=color)
+            ax = sns.boxplot(data=df, x=x_col, y=y_col, color=color)
         elif chart in ["scatter plot", "scatterplot", "scatter chart", "scatterchart"]:
-            fig, ax = sns.scatterplot(data=df, x=x_col, y=y_col, color=color)
+            ax = sns.scatterplot(data=df, x=x_col, y=y_col, color=color)
         else:
             raise ChartNotFoundError(f"{chart} is not a valid charttype")
 
-        ax.title(title)
+        ax.set_title(title)
 
-        ax.xlabel(x_label)
-        ax.ylabel(y_label)
+        ax.set_xlabel(x_label)
+        ax.set_ylabel(y_label)
 
         if x_lim is not None:
-            ax.xlim(x_lim[0], x_lim[1])
+            ax.set_xlim(x_lim[0], x_lim[1])
         if y_lim is not None:
-            ax.ylim(y_lim[0], y_lim[1])
+            ax.set_ylim(y_lim[0], y_lim[1])
 
         return fig
 
