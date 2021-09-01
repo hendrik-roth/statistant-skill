@@ -75,7 +75,21 @@ class Statistant(MycroftSkill):
 
     @staticmethod
     def get_file_path(func, filename, filetype):
+        """
+        function for getting the filepath to save a figure
+        Returns
+        -------
+        path
 
+        Parameters
+        -------
+        func
+            name of the function
+        filename
+            name of the file which is used for the figure
+        filetype
+            defines which type the file should be (png, jpg, ...)
+        """
         directory = f"statistant/results/{func}_{filename}_{token_hex(5)}.{filetype}"
         parent_dir = os.path.expanduser("~")
         path = os.path.join(parent_dir, directory)
@@ -434,6 +448,9 @@ class Statistant(MycroftSkill):
             try:
                 calc = self.init_calculator(filename, func)
 
+                # check if columns are in file
+                calc.charts(chart_type, x_col, y_col, title, x_label, y_label, x_lim, y_lim, color)
+
                 # ask if user wants to adjust something
                 want_adjustment = self.ask_yesno('want.adjustments', {'function': chart_type, 'more': ''})
 
@@ -495,6 +512,10 @@ class Statistant(MycroftSkill):
 
                 if result is not None:
 
+                    # save plot in Directory and open it
+                    result.savefig(path)
+                    self.open_file(path)
+
                     if y_col is None:
                         self.speak_dialog('charts.one.column', {'chart_type': chart_type,
                                                                 'colname_x': x_col,
@@ -510,10 +531,6 @@ class Statistant(MycroftSkill):
                                                      'colname_x': x_col,
                                                      'colname_y': y_col,
                                                      'file': filename})
-
-                    # save plot in Directory and open it
-                    result.savefig(path)
-                    self.open_file(path)
 
             # Error handling
             except KeyError:

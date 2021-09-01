@@ -261,6 +261,11 @@ class StatistantCalc:
             [optional] limits for y-axis scale
         color
             [optional] color for the plot
+
+        Returns
+        -------
+        fig
+            plot which is created
         """
 
         df = self.df
