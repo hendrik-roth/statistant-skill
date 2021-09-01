@@ -25,9 +25,6 @@ class StatistantCalc:
         parent_dir = os.path.expanduser("~")
         self.path = os.path.join(parent_dir, directory)
 
-        pdf_dir = f"statistant/results/{self.func}_{self.filename}_{token_hex(5)}.pdf"
-        self.pdf_path = os.path.join(parent_dir, pdf_dir)
-
     @staticmethod
     def open_file(filepath):
         """
@@ -264,6 +261,11 @@ class StatistantCalc:
             [optional] limits for y-axis scale
         color
             [optional] color for the plot
+
+        Returns
+        -------
+        fig
+            plot which is created
         """
 
         df = self.df
@@ -278,35 +280,32 @@ class StatistantCalc:
             y_col = self.df[y_colname]
             x_col = self.df[x_colname]
 
+        fig, ax = plt.subplots()
+
         if chart == "histogram":
-            sns.histplot(data=df, x=x_col, y=y_col, color=color),
+            ax = sns.histplot(data=df, x=x_col, y=y_col, color=color)
         elif chart in ["bar chart", "barchart", "bar plot", "barplot"]:
-            sns.barplot(data=df, x=x_col, y=y_col, color=color),
+            ax = sns.barplot(data=df, x=x_col, y=y_col, color=color)
         elif chart in ["line chart", "linechart", "line plot", "lineplot"]:
-            sns.lineplot(data=df, x=x_col, y=y_col, color=color),
+            ax = sns.lineplot(data=df, x=x_col, y=y_col, color=color)
         elif chart in ["box plot", "boxplot", "box chart", "boxchart"]:
-            sns.boxplot(data=df, x=x_col, y=y_col, color=color),
+            ax = sns.boxplot(data=df, x=x_col, y=y_col, color=color)
         elif chart in ["scatter plot", "scatterplot", "scatter chart", "scatterchart"]:
-            sns.scatterplot(data=df, x=x_col, y=y_col, color=color)
+            ax = sns.scatterplot(data=df, x=x_col, y=y_col, color=color)
         else:
             raise ChartNotFoundError(f"{chart} is not a valid charttype")
 
-        plt.title(title)
+        ax.set_title(title)
 
-        plt.xlabel(x_label)
-        plt.ylabel(y_label)
+        ax.set_xlabel(x_label)
+        ax.set_ylabel(y_label)
 
         if x_lim is not None:
-            plt.xlim(x_lim[0], x_lim[1])
+            ax.set_xlim(x_lim[0], x_lim[1])
         if y_lim is not None:
-            plt.ylim(y_lim[0], y_lim[1])
+            ax.set_ylim(y_lim[0], y_lim[1])
 
-        # save plot in Directory
-        plt.savefig(self.path)
-        plt.clf()
-
-        # Open plot
-        self.open_file(self.path)
+        return fig
 
     def simple_regression(self, kind: str, x_col, y_col):
         """

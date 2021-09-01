@@ -3,6 +3,7 @@ import re
 import subprocess
 import sys
 from functools import partial
+from secrets import token_hex
 
 import inflect
 from mycroft import MycroftSkill, intent_file_handler
@@ -71,6 +72,28 @@ class Statistant(MycroftSkill):
             self.speak_dialog('FileNotUnique.error', {'filename': filename})
 
         return calc
+
+    @staticmethod
+    def get_file_path(func, filename, filetype):
+        """
+        function for getting the filepath to save a figure
+        Returns
+        -------
+        path
+
+        Parameters
+        -------
+        func
+            name of the function
+        filename
+            name of the file which is used for the figure
+        filetype
+            defines which type the file should be (png, jpg, ...)
+        """
+        directory = f"statistant/results/{func}_{filename}_{token_hex(5)}.{filetype}"
+        parent_dir = os.path.expanduser("~")
+        path = os.path.join(parent_dir, directory)
+        return path
 
     @staticmethod
     def open_file(filepath):
@@ -408,6 +431,8 @@ class Statistant(MycroftSkill):
         y_lim = None
         color = None
 
+        path = self.get_file_path(func, filename, "png")
+
         chart_type = message.data.get('chart_type').lower()
 
         if chart_type in self.chart_types:
@@ -422,6 +447,9 @@ class Statistant(MycroftSkill):
 
             try:
                 calc = self.init_calculator(filename, func)
+
+                # check if columns are in file
+                calc.charts(chart_type, x_col, y_col, title, x_label, y_label, x_lim, y_lim, color)
 
                 # ask if user wants to adjust something
                 want_adjustment = self.ask_yesno('want.adjustments', {'function': chart_type, 'more': ''})
@@ -477,26 +505,32 @@ class Statistant(MycroftSkill):
                     want_adjustment = self.ask_yesno('want.adjustments', {'function': chart_type, 'more': 'more'})
 
                 if want_adjustment == "no":
-                    calc.charts(chart_type, x_col, y_col, title, x_label, y_label, x_lim, y_lim, color)
+                    result = calc.charts(chart_type, x_col, y_col, title, x_label, y_label, x_lim, y_lim, color)
                 else:
                     self.speak_dialog('could.not.understand')
-                    calc.charts(chart_type, x_col, y_col, title, x_label, y_label, x_lim, y_lim, color)
+                    result = calc.charts(chart_type, x_col, y_col, title, x_label, y_label, x_lim, y_lim, color)
 
-                if y_col is None:
-                    self.speak_dialog('charts.one.column', {'chart_type': chart_type,
-                                                            'colname_x': x_col,
-                                                            'axis': 'x axis',
-                                                            'file': filename})
-                elif x_col is None:
-                    self.speak_dialog('charts.one.column', {'chart_type': chart_type,
-                                                            'colname_x': y_col,
-                                                            'axis': 'y axis',
-                                                            'file': filename})
-                else:
-                    self.speak_dialog('charts', {'chart_type': chart_type,
-                                                 'colname_x': x_col,
-                                                 'colname_y': y_col,
-                                                 'file': filename})
+                if result is not None:
+
+                    # save plot in Directory and open it
+                    result.savefig(path)
+                    self.open_file(path)
+
+                    if y_col is None:
+                        self.speak_dialog('charts.one.column', {'chart_type': chart_type,
+                                                                'colname_x': x_col,
+                                                                'axis': 'x axis',
+                                                                'file': filename})
+                    elif x_col is None:
+                        self.speak_dialog('charts.one.column', {'chart_type': chart_type,
+                                                                'colname_x': y_col,
+                                                                'axis': 'y axis',
+                                                                'file': filename})
+                    else:
+                        self.speak_dialog('charts', {'chart_type': chart_type,
+                                                     'colname_x': x_col,
+                                                     'colname_y': y_col,
+                                                     'file': filename})
 
             # Error handling
             except KeyError:
