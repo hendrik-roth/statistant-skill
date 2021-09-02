@@ -307,6 +307,34 @@ class StatistantCalc:
 
         return fig
 
+    def pie_charts(self, colname: str, title: str = None):
+        """
+        function for calculating, visualize and save the cluster analysis
+
+        Parameters
+        -------
+        colname
+            is the column which should be selected for the piechart
+        title
+            [optional] title for plot
+
+
+        Returns
+        -------
+        fig
+            pieplot which is created
+        """
+
+        df = self.df
+
+        fig, ax = plt.subplots()
+        ax.pie(df[colname], labels=df[colname], startangle=90)
+        ax.legend(bbox_to_anchor=(1.2, 0.6))
+        ax.set_title(title)
+        plt.tight_layout()
+
+        return fig
+
     def simple_regression(self, kind: str, x_col, y_col):
         """
         function for performing a simple regression

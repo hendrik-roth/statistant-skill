@@ -540,6 +540,50 @@ class Statistant(MycroftSkill):
         else:
             self.speak_dialog('ChartNotFound.error', {'chart_type': chart_type})
 
+    @intent_file_handler('pie.charts.intent')
+    def handle_pie_charts(self, message):
+        """
+        Function for performing pie-chart visualizations.
+        This function contains extracting filename, columns and title;
+        reading the file with FileHandler and calculating specific charts.
+
+        Parameters
+        ----------
+        message
+            Message Bus event information from the intent parser
+        """
+
+        func = "piechart"
+        filename = message.data.get('file')
+        col = message.data.get('colname')
+
+        path = self.get_file_path(func, filename, "png")
+
+        try:
+            calc = self.init_calculator(filename, func)
+
+            # check if column is in file
+            calc.pie_charts(col)
+
+            want_title = self.ask_yesno('want.title')
+
+            if want_title == "yes":
+                title = self.get_response('name.title')
+            else:
+                title = None
+
+            result = calc.pie_charts(col, title)
+
+            if result is not None:
+                # save plot in Directory and open it
+                result.savefig(path)
+                self.open_file(path)
+
+                self.speak_dialog('pie.charts', {'colname': col, 'file': filename})
+
+        except KeyError:
+            self.speak_dialog('KeyError', {'colname': col, 'func': func})
+
     @intent_file_handler('frequency.intent')
     def handle_frequency(self, message):
 
