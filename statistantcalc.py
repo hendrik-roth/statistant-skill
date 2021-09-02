@@ -328,7 +328,7 @@ class StatistantCalc:
         df = self.df
 
         fig, ax = plt.subplots()
-        ax.pie(df[colname], labels=df[colname], shadow=True, startangle=90)
+        ax.pie(df[colname], labels=df[colname], startangle=90)
         ax.legend(bbox_to_anchor=(1.2, 0.6))
         ax.set_title(title)
         plt.tight_layout()
