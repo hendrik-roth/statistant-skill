@@ -723,6 +723,32 @@ class Statistant(MycroftSkill):
 
             self.speak_dialog('regression', {'regression_kind': model_kind})
 
+    @staticmethod
+    def hypothesis_validator(utterance):
+        hypothesis = utterance.lower()
+        hypothesis_kinds = ["corresponds to the population", "are equal", "there is a difference between",
+                            "are independent"]
+
+        valid_hypothesis = any(kind in hypothesis for kind in hypothesis_kinds)
+        return valid_hypothesis
+
+    @intent_file_handler('hypothesis.tests.intent')
+    def handle_hypothesis_tests(self):
+        func = "hypothesis test"
+        hypothesis = self.get_response('ask.hypothesis', num_retries=2, validator=self.hypothesis_validator,
+                                       on_fail='hypothesis.error')
+        filename = self.get_response('hypothesis.file', num_retries=2)
+
+        calc = self.init_calculator(filename, func)
+
+        answer = None
+        try:
+            answer = calc.hypothesis_test(hypothesis)
+        except ValueError:
+            self.speak_dialog("error")
+        if answer is not None:
+            self.speak_dialog(answer)
+
 
 def create_skill():
     return Statistant()

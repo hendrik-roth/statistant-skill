@@ -9,7 +9,7 @@ import seaborn as sns
 import statsmodels.formula.api as sm
 from sklearn.cluster import KMeans
 
-from .exceptions import FunctionNotFoundError, ChartNotFoundError
+from .exceptions import FunctionNotFoundError, ChartNotFoundError, HypothesisError
 
 matplotlib.use('Agg')
 
@@ -403,3 +403,29 @@ class StatistantCalc:
             model = sm.ols(data=self.df, formula=formula).fit()  # linear regression
 
         return model
+
+    def hypothesis_test(self, hypothesis):
+        # TODO find better solution
+        if "corresponds to the population" in hypothesis:
+            func = self.one_sample_test
+        elif "are equal" in hypothesis:
+            func = self.two_sample_test
+        elif "there is a difference between" in hypothesis:
+            func = self.paired_sample_test
+        elif "are independent" in hypothesis:
+            func = self.chi_squared_test
+        else:
+            raise HypothesisError("no valid hypothesis")
+        return func(hypothesis)
+
+    def one_sample_test(self, hypothesis):
+        pass
+
+    def two_sample_test(self, hypothesis):
+        pass
+
+    def paired_sample_test(self, hypothesis):
+        pass
+
+    def chi_squared_test(self, hypothesis):
+        pass

@@ -8,3 +8,7 @@ class FunctionNotFoundError(Exception):
 
 class ChartNotFoundError(Exception):
     pass
+
+
+class HypothesisError(Exception):
+    pass
