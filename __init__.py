@@ -746,6 +746,8 @@ class Statistant(MycroftSkill):
             answer = calc.hypothesis_test(hypothesis)
         except ValueError:
             self.speak_dialog("error")
+        except KeyError:
+            self.speak_dialog("error")
         if answer is not None:
             self.speak_dialog(answer)
 
