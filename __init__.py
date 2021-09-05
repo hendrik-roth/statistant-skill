@@ -749,6 +749,20 @@ class Statistant(MycroftSkill):
         if answer is not None:
             self.speak_dialog(answer)
 
+    @intent_file_handler('percentage.change.intent')
+    def handle_percentage_change(self, message):
+        val1 = message.data.get('value_one')
+        val2 = message.data.get('value_two')
+
+        try:
+            value_one = w2n.word_to_num(val1)
+            value_two = w2n.word_to_num(val2)
+            ptg_change = ((value_two - value_one) / value_one) * 100
+            self.speak_dialog('percentage.change',
+                              {'value_one': value_one, 'value_two': value_two, 'ptg_change': ptg_change})
+        except:
+            self.speak_dialog('percentage.error')
+
 
 def create_skill():
     return Statistant()
