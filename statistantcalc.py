@@ -407,7 +407,9 @@ class StatistantCalc:
         return model
 
     def hypothesis_test(self, hypothesis):
-        # TODO find better solution
+        if hypothesis is None:
+            raise HypothesisError("no valid hypothesis")
+
         if "corresponds to the population" in hypothesis:
             func = self.one_sample_test
         elif "are equal" in hypothesis:

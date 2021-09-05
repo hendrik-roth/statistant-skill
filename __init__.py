@@ -9,7 +9,7 @@ import inflect
 from mycroft import MycroftSkill, intent_file_handler
 from word2number import w2n
 
-from .exceptions import FileNotUniqueError, FunctionNotFoundError, ChartNotFoundError
+from .exceptions import FileNotUniqueError, FunctionNotFoundError, ChartNotFoundError, HypothesisError
 from .filehandler import FileHandler
 from .report import ReportGenerator
 from .statistantcalc import StatistantCalc
@@ -744,10 +744,10 @@ class Statistant(MycroftSkill):
         answer = None
         try:
             answer = calc.hypothesis_test(hypothesis)
-        except ValueError:
-            self.speak_dialog("error")
         except KeyError:
-            self.speak_dialog("error")
+            self.speak_dialog("hypothesis.key.error")
+        except HypothesisError:
+            self.speak_dialog("hypothesis.none.error")
         if answer is not None:
             self.speak_dialog(answer)
 
