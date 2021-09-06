@@ -1,0 +1,1 @@
+calculate the gini coefficient of (row {lower} until (row |){upper} of (the column |){colname}|(the column |){colname}) in (the file|){file}
