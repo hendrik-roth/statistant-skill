@@ -5,11 +5,13 @@ from secrets import token_hex
 
 import matplotlib
 import matplotlib.pyplot as plt
+import pandas as pd
+import scipy.stats as stats
 import seaborn as sns
 import statsmodels.formula.api as sm
 from sklearn.cluster import KMeans
 
-from .exceptions import FunctionNotFoundError, ChartNotFoundError
+from .exceptions import FunctionNotFoundError, ChartNotFoundError, HypothesisError
 
 matplotlib.use('Agg')
 
@@ -403,3 +405,64 @@ class StatistantCalc:
             model = sm.ols(data=self.df, formula=formula).fit()  # linear regression
 
         return model
+
+    def hypothesis_test(self, hypothesis):
+        if hypothesis is None:
+            raise HypothesisError("no valid hypothesis")
+
+        if "corresponds to the population" in hypothesis:
+            func = self.one_sample_test
+        elif "are equal" in hypothesis:
+            func = self.two_sample_test
+        elif "there is a difference between" in hypothesis:
+            func = self.paired_sample_test
+        elif "are independent" in hypothesis:
+            func = self.chi_squared_test
+        else:
+            raise HypothesisError("no valid hypothesis")
+        return func(hypothesis)
+
+    def one_sample_test(self, hypothesis):
+        # hypothesis: {attr} corresponds to the population
+        hypothesis_split = hypothesis.split(" ")
+        col = hypothesis_split[0].lower()
+
+        alt_hypothesis = f"{col} does not corresponds to the population"
+        tscore, pval = stats.ttest_1samp(a=self.df[col], popmean=self.df[col].mean())
+        answer = alt_hypothesis if pval < 0.05 else hypothesis
+        return answer
+
+    def two_sample_test(self, hypothesis):
+        # hypothesis: {attr_1} and {attr_2} are equal
+        hypothesis_split = hypothesis.split(" ")
+        col1 = hypothesis_split[0].lower()
+        col2 = hypothesis_split[2].lower()
+
+        alt_hypothesis = f"{col1} and {col2} are not equal"
+        tscore, pval = stats.ttest_ind(a=self.df[col1], b=self.df[col2], equal_var=False)
+        answer = alt_hypothesis if pval < 0.05 else hypothesis
+        return answer
+
+    def paired_sample_test(self, hypothesis):
+        # hypothesis: There is a difference between {attr_1} and {attr_2}
+        hypothesis_split = hypothesis.split(" ")
+        before = hypothesis_split[-3].lower()
+        after = hypothesis_split[-1].lower()
+
+        alt_hypothesis = f"There is not a difference between {before} and {after}"
+        tscore, pval = stats.ttest_rel(a=self.df[before], b=self.df[after])
+        answer = alt_hypothesis if pval < 0.05 else hypothesis
+        return answer
+
+    def chi_squared_test(self, hypothesis):
+        # hypothesis: {attr_1} and {attr_2} are independent
+        hypothesis_split = hypothesis.split(" ")
+        col1 = hypothesis_split[0].lower()
+        col2 = hypothesis_split[2].lower()
+
+        alt_hypothesis = f"{col1} and {col2} are not independent"
+
+        ct = pd.crosstab(self.df[col1], self.df[col2])
+        chi, pval, dof, exp = stats.chi2_contingency(ct)
+        answer = alt_hypothesis if pval < 0.05 else hypothesis
+        return answer

@@ -9,7 +9,7 @@ import inflect
 from mycroft import MycroftSkill, intent_file_handler
 from word2number import w2n
 
-from .exceptions import FileNotUniqueError, FunctionNotFoundError, ChartNotFoundError
+from .exceptions import FileNotUniqueError, FunctionNotFoundError, ChartNotFoundError, HypothesisError
 from .filehandler import FileHandler
 from .report import ReportGenerator
 from .statistantcalc import StatistantCalc
@@ -722,6 +722,34 @@ class Statistant(MycroftSkill):
             self.open_file(report_generator.output_path)
 
             self.speak_dialog('regression', {'regression_kind': model_kind})
+
+    @staticmethod
+    def hypothesis_validator(utterance):
+        hypothesis = utterance.lower()
+        hypothesis_kinds = ["corresponds to the population", "are equal", "there is a difference between",
+                            "are independent"]
+
+        valid_hypothesis = any(kind in hypothesis for kind in hypothesis_kinds)
+        return valid_hypothesis
+
+    @intent_file_handler('hypothesis.tests.intent')
+    def handle_hypothesis_tests(self):
+        func = "hypothesis test"
+        hypothesis = self.get_response('ask.hypothesis', num_retries=2, validator=self.hypothesis_validator,
+                                       on_fail='hypothesis.error')
+        filename = self.get_response('hypothesis.file', num_retries=2)
+
+        calc = self.init_calculator(filename, func)
+
+        answer = None
+        try:
+            answer = calc.hypothesis_test(hypothesis)
+        except KeyError:
+            self.speak_dialog("hypothesis.key.error")
+        except HypothesisError:
+            self.speak_dialog("hypothesis.none.error")
+        if answer is not None:
+            self.speak_dialog(answer)
 
     @intent_file_handler('percentage.change.intent')
     def handle_percentage_change(self, message):
