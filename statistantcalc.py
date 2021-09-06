@@ -10,6 +10,7 @@ import scipy.stats as stats
 import seaborn as sns
 import statsmodels.formula.api as sm
 from sklearn.cluster import KMeans
+import numpy as np
 
 from .exceptions import FunctionNotFoundError, ChartNotFoundError, HypothesisError
 
@@ -466,3 +467,33 @@ class StatistantCalc:
         chi, pval, dof, exp = stats.chi2_contingency(ct)
         answer = alt_hypothesis if pval < 0.05 else hypothesis
         return answer
+
+    def gini_coefficient(self, col: str,  interval=False, lower: int = None, upper: int = None):
+        """
+        function for calculating the gini coefficient
+
+        Parameters
+        -------
+        col
+            is the column which should be selected
+        interval
+            [optional] bool if there should be an interval as selected or not
+        lower
+            [optional] lower value of selected interval
+        upper
+            [optional] upper value of selected interval
+
+        Returns
+        -------
+        gini
+            gini coefficient of given data
+        """
+        self.do_selection(col, interval, lower, upper)
+        col = self.selected
+
+        gini = None
+        diffsum = 0
+        for i, xi in enumerate(col[:-1], 1):
+            diffsum += np.sum(np.abs(xi - col[i:]))
+            gini = (diffsum / (len(col) ** 2 * np.mean(col))).round(3)
+        return gini
