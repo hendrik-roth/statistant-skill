@@ -44,6 +44,22 @@ class StatistantCalc:
             opener = "open" if sys.platform == "darwin" else "xdg-open"
             subprocess.call([opener, filepath])
 
+    @staticmethod
+    def calc_gini(col):
+        diffsum = 0
+        for i, xi in enumerate(col[:-1], 1):
+            diffsum += np.sum(np.abs(xi - col[i:]))
+        return (diffsum / (len(col) ** 2 * np.mean(col))).round(3)
+
+    @staticmethod
+    def calc_herfindahl(col):
+        sum_col = col.sum()
+        herfindahl = 0
+        for i in col:
+            fi_squared = (i / sum_col) ** 2
+            herfindahl += fi_squared
+        return herfindahl
+
     def stats_basic(self, func: str, col: str, interval=False, lower: int = None, upper: int = None):
         """
         Function for statistical basic functions.
@@ -87,6 +103,10 @@ class StatistantCalc:
         # safe call for function chooser
         if func in function.keys():
             result = function[func]()
+        elif func == "gini coefficient":
+            result = self.calc_gini(df)
+        elif func == "herfindahl index":
+            result = self.calc_herfindahl(df)
         else:
             raise FunctionNotFoundError(f"Function {func} is not a valid function")
 
@@ -467,33 +487,3 @@ class StatistantCalc:
         chi, pval, dof, exp = stats.chi2_contingency(ct)
         answer = alt_hypothesis if pval < 0.05 else hypothesis
         return answer
-
-    def gini_coefficient(self, col: str,  interval=False, lower: int = None, upper: int = None):
-        """
-        function for calculating the gini coefficient
-
-        Parameters
-        -------
-        col
-            is the column which should be selected
-        interval
-            [optional] bool if there should be an interval as selected or not
-        lower
-            [optional] lower value of selected interval
-        upper
-            [optional] upper value of selected interval
-
-        Returns
-        -------
-        gini
-            gini coefficient of given data
-        """
-        self.do_selection(col, interval, lower, upper)
-        col = self.selected
-
-        gini = None
-        diffsum = 0
-        for i, xi in enumerate(col[:-1], 1):
-            diffsum += np.sum(np.abs(xi - col[i:]))
-            gini = (diffsum / (len(col) ** 2 * np.mean(col))).round(3)
-        return gini
