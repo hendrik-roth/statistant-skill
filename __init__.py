@@ -662,9 +662,11 @@ class Statistant(MycroftSkill):
             Message Bus event information from the intent parser
         """
         model_kind = message.data.get('regression_kind')
-        x_col = message.data.get('x_colname')
+        x_colname = message.data.get('x_colname')
         y_col = message.data.get('y_colname')
         filename = message.data.get('file')
+
+        x_col = [x_colname]
 
         func = f"simple-{model_kind}-regression"
 
@@ -672,7 +674,7 @@ class Statistant(MycroftSkill):
 
         model = None
         try:
-            model = calc.simple_regression(model_kind, x_col, y_col)
+            model = calc.simple_regression(model_kind, x_colname, y_col)
         except KeyError:
             self.speak_dialog("KeyError", {"colname": f"{x_col} or column {y_col}", "func": func})
         except ValueError:
