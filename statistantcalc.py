@@ -487,3 +487,22 @@ class StatistantCalc:
         chi, pval, dof, exp = stats.chi2_contingency(ct)
         answer = alt_hypothesis if pval < 0.05 else hypothesis
         return answer
+
+    def lorenz_curve(self, colname: str = None, title: str = None):
+
+        df = self.df
+        col = df[colname]
+
+        df = np.asarray(col)
+        sorted_df = np.sort(df)
+        y = (sorted_df / sorted_df.sum()).cumsum()
+        n = df.shape[0]
+        x = np.arange(1, n + 1) / n
+
+        fig, ax = plt.subplots()
+        ax.plot(x, y, label='Lorenz Curve')
+        ax.plot((0, 1), (0, 1), color='r', label='Perfect Equality')
+        ax.legend()
+        ax.set_title(title)
+
+        return fig
