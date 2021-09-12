@@ -765,51 +765,5 @@ class Statistant(MycroftSkill):
         except:
             self.speak_dialog('percentage.error')
 
-    @intent_file_handler('gini.intent')
-    def handle_gini_coefficient(self, message):
-        """
-            Function for calculating the gini coefficient.
-        This function contains extracting filename, col, lower and upper from utterance;
-        reading the file with FileHandler and calculating specific function with StatistantCalc.
-
-        Parameters
-        ----------
-        message
-            User Utterance of intent
-
-        Returns
-        -------
-        result
-            Result of gini coefficient (one value)
-            """
-        result = None
-
-        filename = message.data.get('file')
-        col = message.data.get('colname').lower()
-        lower = message.data.get('lower')
-        upper = message.data.get('upper')
-
-        if lower is not None:
-            lower = w2n.word_to_num(lower)
-            upper = w2n.word_to_num(upper)
-
-        try:
-            calc = self.init_calculator(filename)
-            if lower is not None and upper is not None:
-                result = calc.gini_coefficient(col, True, lower, upper)
-            else:
-                result = calc.gini_coefficient(col)
-
-        except KeyError:
-            self.speak_dialog('KeyError', {'colname': col, 'func': 'gini coefficient'})
-        except IndexError:
-            self.speak_dialog('IndexError', {'func': 'gini coefficient'})
-        except FunctionNotFoundError:
-            self.speak_dialog('FunctionNotFound.error', {'func': 'gini coefficient'})
-
-        if result is not None:
-            self.speak_dialog('basicstats', {'function': 'gini coefficient', 'result': result})
-
-
 def create_skill():
     return Statistant()
