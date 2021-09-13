@@ -565,7 +565,7 @@ class Statistant(MycroftSkill):
             # check if column is in file
             calc.pie_charts(col)
 
-            want_title = self.ask_yesno('want.title')
+            want_title = self.ask_yesno('want.title', {'function': func})
 
             if want_title == "yes":
                 title = self.get_response('name.title')
@@ -766,6 +766,40 @@ class Statistant(MycroftSkill):
                               {'value_one': value_one, 'value_two': value_two, 'ptg_change': ptg_change})
         except:
             self.speak_dialog('percentage.error')
+
+    @intent_file_handler('lorenz.curve.intent')
+    def handle_lorenz_curve(self, message):
+
+        func = "lorenz curve"
+        filename = message.data.get('file')
+        col = message.data.get('colname_x')
+        path = self.get_file_path(func, filename, "png")
+
+        try:
+            calc = self.init_calculator(filename)
+
+            # check if column is in file
+            calc.pie_charts(col)
+
+            want_title = self.ask_yesno('want.title', {'function': func})
+
+            if want_title == "yes":
+                title = self.get_response('name.title')
+            else:
+                title = None
+
+            result = calc.lorenz_curve(col, title)
+
+            if result is not None:
+                # save plot in Directory and open it
+                result.savefig(path)
+                self.open_file(path)
+
+                self.speak_dialog('lorenz.curve', {'colname': col, 'file': filename})
+
+        except KeyError:
+            self.speak_dialog('KeyError', {'colname': col, 'func': func})
+
 
 def create_skill():
     return Statistant()
