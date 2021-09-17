@@ -1,7 +1,7 @@
 # <img src="https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/calculator.svg" card_color="#22A7F0" width="50" height="50" style="vertical-align:bottom"/> Statistant
 > **_NOTE:_**  currently under development. Hence not all functions are possible <br> See all available features under [recent features](https://github.com/hendrik-roth/statistant-skill/wiki/recent-features)
 
-Let mycroft perform basic statistical calculations
+This is a [Mycroft](https://mycroft.ai/) Skill which let mycroft perform basic statistical calculations.
 
 ## About
 You can ask mycroft for:
@@ -13,13 +13,25 @@ You can ask mycroft for:
 - hypothesis tests (chi-squared, 1-samp-ttest, 2-samp-ttest, paired-sample-test)
 - cluster analysis
 - percantage changes
+- gini coefficient
+- herfindahl index
+- lorenz curve
 <br>
 
 For all possible Interactions with mycroft read the wiki for [interactions](https://github.com/hendrik-roth/statistant-skill/wiki/interactions)
 
-## Examples
+## Examples of Intents
 - "what is the average of examplecolumn in testfile?"
-- "create a barchart with X as the x-axis and Y as the y-axis of testfile"
+- "create a bar chart of testfile"
+  - "Okay, which column should i use for the x-axis?"
+  - ...
+- "make a cluster analysis of testfile with four clusters"
+  - "Okay, which column should i use for the x-axis?"
+  - ...
+- "Do a simple linear regression with x equals x_val and y equals y_val of the file testfile"
+- "May I give you a hypothesis?"
+  - "Of course. What is your hypothesis?"
+  - ...
 
 ## Credits
 Hendrik Roth (@hendrik-roth) and Jannik Wieland (@jannikwieland)
@@ -32,4 +44,6 @@ Information
 ## Tags
 #Statistics
 #Calculator
+#Mycroft
+#Python
 
