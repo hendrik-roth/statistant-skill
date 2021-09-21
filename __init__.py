@@ -769,7 +769,17 @@ class Statistant(MycroftSkill):
 
     @intent_file_handler('lorenz.curve.intent')
     def handle_lorenz_curve(self, message):
+        """
+        Function for performing lorenz-curve visualizations.
+        This function contains extracting filename, columns and title;
+        reading the file with FileHandler and calculating the lorenz curve.
 
+        Parameters
+        ----------
+        message
+            Message Bus event information from the intent parser
+
+        """
         func = "lorenz curve"
         filename = message.data.get('file')
         col = message.data.get('colname_x')

@@ -46,6 +46,7 @@ class StatistantCalc:
 
     @staticmethod
     def calc_gini(col):
+        col = col.to_numpy()
         diffsum = 0
         for i, xi in enumerate(col[:-1], 1):
             diffsum += np.sum(np.abs(xi - col[i:]))
@@ -489,6 +490,22 @@ class StatistantCalc:
         return answer
 
     def lorenz_curve(self, colname: str = None, title: str = None):
+        """
+        function for calculating, visualize and save the lorenz curve
+
+        Parameters
+        -------
+        colname
+            is the column which should be selected for the lorenz curve
+        title
+            [optional] title for plot
+
+
+        Returns
+        -------
+        fig
+            lorenz curve which is created
+        """
 
         df = self.df
         col = df[colname]
