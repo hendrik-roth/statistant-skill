@@ -46,14 +46,39 @@ class StatistantCalc:
 
     @staticmethod
     def calc_gini(col):
+        """
+
+        Parameters
+        ----------
+        col
+            column which should be used for calculating the gini coefficient
+
+        Returns
+        -------
+        gini
+            value of gini coefficient
+        """
         col = col.to_numpy()
         diffsum = 0
         for i, xi in enumerate(col[:-1], 1):
             diffsum += np.sum(np.abs(xi - col[i:]))
-        return (diffsum / (len(col) ** 2 * np.mean(col))).round(3)
+        gini = (diffsum / (len(col) ** 2 * np.mean(col))).round(3)
+        return gini
 
     @staticmethod
     def calc_herfindahl(col):
+        """
+
+        Parameters
+        ----------
+        col
+            column which should be used for calculating the herfindahl index
+
+        Returns
+        -------
+        herfindahl
+            value of herfindahl index
+        """
         sum_col = col.sum()
         herfindahl = 0
         for i in col:
