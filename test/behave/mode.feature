@@ -8,3 +8,8 @@ Feature: calculate-mode
     Given an english speaking user
     When the user says "tell me the mode of z in test"
     Then "statistant-skill" should reply with "The mode is 2"
+
+  Scenario: calculate mode z alternative
+    Given an english speaking user
+    When the user says "what is the mode of z in test"
+    Then "statistant-skill" should reply with "The mode is 2"
