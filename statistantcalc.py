@@ -5,12 +5,12 @@ from secrets import token_hex
 
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import scipy.stats as stats
 import seaborn as sns
 import statsmodels.formula.api as sm
 from sklearn.cluster import KMeans
-import numpy as np
 
 from .exceptions import FunctionNotFoundError, ChartNotFoundError, HypothesisError
 
@@ -235,6 +235,8 @@ class StatistantCalc:
                 lower, upper = upper, lower
             # select interval
             self.selected = self.df.loc[self.df.index[(lower - 1):upper], col].astype('float64')
+        # drop all NaN in selected interval
+        self.selected.dropna(how="all", inplace=True)
 
     def cluster(self, x_colname: str, y_colname: str, num_clusters: int,
                 title: str = None, x_label: str = None, y_label: str = None):
@@ -282,6 +284,21 @@ class StatistantCalc:
         self.open_file(self.path)
 
     def frequency(self, val: int, col: str, kind: str = "absolute"):
+        """
+        function for calculating frequency of cell
+        Parameters
+        ----------
+        val
+            is the value which should the frequency be calculated
+        col
+            is column of value
+        kind
+            kind of frequency: absolute or relative
+
+        Returns
+        -------
+
+        """
         return round(self.df[col].value_counts()[val].astype("float64"), 3) if kind == "absolute" else round(
             self.df[col].value_counts()[val].astype("float64") / len(self.df[col]), 3)
 
@@ -454,6 +471,20 @@ class StatistantCalc:
         return model
 
     def hypothesis_test(self, hypothesis):
+        """
+        function for performing a hypothesis test
+
+        Parameters
+        ----------
+        hypothesis
+            is the hypothesis
+
+        Returns
+        -------
+        answer
+            answer of hypothesis
+
+        """
         if hypothesis is None:
             raise HypothesisError("no valid hypothesis")
 
@@ -470,6 +501,19 @@ class StatistantCalc:
         return func(hypothesis)
 
     def one_sample_test(self, hypothesis):
+        """
+        function for performing one sample test
+
+        Parameters
+        ----------
+        hypothesis
+            is the hypothesis
+
+        Returns
+        -------
+        answer
+            answer of hypothesis
+        """
         # hypothesis: {attr} corresponds to the population
         hypothesis_split = hypothesis.split(" ")
         col = hypothesis_split[0].lower()
@@ -480,6 +524,18 @@ class StatistantCalc:
         return answer
 
     def two_sample_test(self, hypothesis):
+        """
+        function for performing a two sample test
+
+        Parameters
+        ----------
+        hypothesis
+            is the hypothesis
+        Returns
+        -------
+        answer
+            answer of hypothesis
+        """
         # hypothesis: {attr_1} and {attr_2} are equal
         hypothesis_split = hypothesis.split(" ")
         col1 = hypothesis_split[0].lower()
@@ -491,6 +547,18 @@ class StatistantCalc:
         return answer
 
     def paired_sample_test(self, hypothesis):
+        """
+        function for performing a paired sample test
+
+        Parameters
+        ----------
+        hypothesis
+            is the hypothesis
+        Returns
+        -------
+        answer
+            answer of hypothesis
+        """
         # hypothesis: There is a difference between {attr_1} and {attr_2}
         hypothesis_split = hypothesis.split(" ")
         before = hypothesis_split[-3].lower()
@@ -502,6 +570,18 @@ class StatistantCalc:
         return answer
 
     def chi_squared_test(self, hypothesis):
+        """
+        function for performing a chi squared test
+
+        Parameters
+        ----------
+        hypothesis
+            is the hypothesis
+        Returns
+        -------
+        answer
+            answer of hypothesis
+        """
         # hypothesis: {attr_1} and {attr_2} are independent
         hypothesis_split = hypothesis.split(" ")
         col1 = hypothesis_split[0].lower()

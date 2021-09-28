@@ -282,7 +282,7 @@ class Statistant(MycroftSkill):
         Returns
         -------
         requested_adjustments
-            requestet adjustments of user
+            requested adjustments of user
         """
 
         requested_adjustments = []
@@ -586,6 +586,15 @@ class Statistant(MycroftSkill):
 
     @intent_file_handler('frequency.intent')
     def handle_frequency(self, message):
+        """
+        function for handling frequency intent.
+        A User can ask mycroft for the frequency of a value in a specific column/interval.
+
+        Parameters
+        -------
+        message
+            Message Bus event information from the intent parser
+        """
 
         filename = message.data.get('file')
         col = message.data.get('colname').lower()
@@ -727,6 +736,19 @@ class Statistant(MycroftSkill):
 
     @staticmethod
     def hypothesis_validator(utterance):
+        """
+        function for validating a hypothesis of a utterance
+
+        Parameters
+        -------
+        utterance
+            utterance of user
+
+        Returns
+        -------
+        valid_hypothesis
+            Boolean if utterance is a valid hypothesis or not
+        """
         hypothesis = utterance.lower()
         hypothesis_kinds = ["corresponds to the population", "are equal", "there is a difference between",
                             "are independent"]
@@ -736,6 +758,9 @@ class Statistant(MycroftSkill):
 
     @intent_file_handler('hypothesis.tests.intent')
     def handle_hypothesis_tests(self):
+        """
+        function for handling hypothesis test intents
+        """
         func = "hypothesis test"
         hypothesis = self.get_response('ask.hypothesis', num_retries=2, validator=self.hypothesis_validator,
                                        on_fail='hypothesis.error')
@@ -755,6 +780,14 @@ class Statistant(MycroftSkill):
 
     @intent_file_handler('percentage.change.intent')
     def handle_percentage_change(self, message):
+        """
+        function for handling percentage change intents
+
+        Parameters
+        ----------
+        message
+            Message Bus event information from the intent parser
+        """
         val1 = message.data.get('value_one')
         val2 = message.data.get('value_two')
 
