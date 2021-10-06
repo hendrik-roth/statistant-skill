@@ -1,5 +1,4 @@
 # <img src="https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/calculator.svg" card_color="#22A7F0" width="50" height="50" style="vertical-align:bottom"/> Statistant
-> **_NOTE:_**  currently under development. Hence not all functions are possible <br> See all available features under [recent features](https://github.com/hendrik-roth/statistant-skill/wiki/recent-features)
 
 This is a [Mycroft](https://mycroft.ai/) Skill which let mycroft perform basic statistical calculations.
 
