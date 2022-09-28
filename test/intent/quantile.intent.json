@@ -1,0 +1,5 @@
+{
+  "utterance": "tell me the 10 percentile quantile of x in test",
+  "intent_type": "basicstats.intent",
+  "expected_response": "The 0.1 quantile is 6.5"
+}
