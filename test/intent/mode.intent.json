@@ -1,5 +1,5 @@
 {
   "utterance": "tell me the mode of x in test",
   "intent_type": "basicstats.intent",
-  "expected_response": "The mode is [2.0, 11.0, 24.0, 33.0, 50.0, 52.0]"
+  "expected_dialog": "basicstats"
 }
