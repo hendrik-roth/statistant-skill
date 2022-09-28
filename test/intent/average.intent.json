@@ -1,5 +1,5 @@
 {
   "utterance": "tell me the average of x in test",
-  "intent_type": "average.intent",
+  "intent_type": "basicstats.intent",
   "expected_response": "The average is 28.667"
 }
