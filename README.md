@@ -21,6 +21,7 @@ For all possible Interactions with mycroft read the wiki for [interactions](http
 
 ## Examples of Intents
 - "what is the average of examplecolumn in testfile?"
+- "tell me the median of examplecolumn in testfile"
 - "create a bar chart of testfile"
   - "Okay, which column should i use for the x-axis?"
   - ...
