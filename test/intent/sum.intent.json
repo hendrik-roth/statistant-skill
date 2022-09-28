@@ -1,0 +1,5 @@
+{
+  "utterance": "tell me the sum of x in test",
+  "intent_type": "basicstats.intent",
+  "expected_response": "The sum is 172.0"
+}
