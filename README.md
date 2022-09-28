@@ -1,9 +1,9 @@
 # <img src="https://raw.githack.com/FortAwesome/Font-Awesome/master/svgs/solid/calculator.svg" card_color="#22A7F0" width="50" height="50" style="vertical-align:bottom"/> Statistant
 
-This is a [Mycroft](https://mycroft.ai/) Skill which let mycroft perform basic statistical calculations.
+This is a [Mycroft](https://mycroft.ai/) Skill which let Mycroft perform basic statistical calculations.
 
 ## About
-You can ask mycroft for:
+You can ask Mycroft for:
 
 - customizing charts (pie, bar, line, histogram, scatter, boxplot)
 - variance, arithmetic average, median, mode, quartil range, range, standard deviation, quartiles, quantiles
@@ -35,6 +35,9 @@ For all possible Interactions with mycroft read the wiki for [interactions](http
 ## Credits
 Hendrik Roth (@hendrik-roth) and Jannik Wieland (@jannikwieland)
 
+## Supported Devices 
+platform_plasmoid
+
 ## Category
 **Productivity**
 Daily
@@ -43,6 +46,7 @@ Information
 ## Tags
 #Statistics
 #Calculator
-#Mycroft
-#Python
+#Excel
+#Csv
+#Analysis
 
