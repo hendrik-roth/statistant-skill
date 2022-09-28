@@ -1,0 +1,5 @@
+{
+  "utterance": "tell me the smallest value of x in test",
+  "intent_type": "basicstats.intent",
+  "expected_response": "The smallest value is 2.0"
+}
