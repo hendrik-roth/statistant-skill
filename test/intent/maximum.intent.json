@@ -1,0 +1,5 @@
+{
+  "utterance": "tell me the top value of x in test",
+  "intent_type": "basicstats.intent",
+  "expected_response": "The top value is 52.0"
+}
