@@ -7,9 +7,9 @@ Feature: calculate-quartile
   Scenario: calculate second quartile
     Given an english speaking user
     When the user says "what is the value of the second quartile of x in test"
-    Then "statistant-skill" should reply with exactly "The quartile range is 28.5"
+    Then "statistant-skill" should reply with exactly "The second quartile is 28.5"
 
   Scenario: calculate third quartile
     Given an english speaking user
     When the user says "what is the value of the third quartile of x in test"
-    Then "statistant-skill" should reply with exactly "The quartile range is 45.75"
+    Then "statistant-skill" should reply with exactly "The third quartile is 45.75"
