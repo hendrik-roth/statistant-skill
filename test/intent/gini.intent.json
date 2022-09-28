@@ -1,0 +1,5 @@
+{
+  "utterance": "tell me the gini coefficient of x in test",
+  "intent_type": "basicstats.intent",
+  "expected_response": "The gini coefficient is 0.364"
+}
