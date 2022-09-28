@@ -12,4 +12,4 @@ Feature: calculate-mode
   Scenario: calculate mode z alternative
     Given an english speaking user
     When the user says "what is the mode of z in test"
-    Then "statistant-skill" should reply with exxactly "The mode is [2]"
+    Then "statistant-skill" should reply with exactly "The mode is [2]"
