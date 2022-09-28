@@ -1,0 +1,5 @@
+{
+  "utterance": "tell me the median of x in test",
+  "intent_type": "basicstats.intent",
+  "expected_response": "The median is 28.5"
+}
