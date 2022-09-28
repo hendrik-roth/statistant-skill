@@ -2,7 +2,7 @@ Feature: calculate-mode
   Scenario: calculate mode x
     Given an english speaking user
     When the user says "tell me the mode of x in test"
-    Then "statistant-skill" should reply with exactly "The mode is [50.0, 24.0, 52.0, 2.0, 33.0, 11.0]"
+    Then "statistant-skill" should reply with exactly "The mode is [2.0, 11.0, 24.0, 33.0, 50.0, 52.0]"
 
   Scenario: calculate mode z
     Given an english speaking user
