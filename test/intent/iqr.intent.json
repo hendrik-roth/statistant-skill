@@ -1,0 +1,5 @@
+{
+  "utterance": "tell me the quartile range of x in test",
+  "intent_type": "basicstats.intent",
+  "expected_response": "The quartile range is 31.5"
+}
